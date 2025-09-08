@@ -1,68 +1,107 @@
 # Auto-Update Setup for Dependent Sites
 
-This npm package is configured to automatically trigger updates in dependent sites when new versions are published.
+This npm package supports automatic updates in dependent sites through scheduled GitHub Actions workflows.
 
 ## How It Works
 
-1. **Package Update**: When changes are pushed to the `main` branch of this package
-2. **Version Bump**: The GitHub workflow automatically bumps the version and publishes
-3. **Dispatch Events**: After publishing, the workflow sends repository dispatch events to configured sites
-4. **Site Updates**: Each site's workflow receives the event, updates the package, tests the build, and commits if successful
-5. **Auto Deploy**: The commit triggers automatic deployment on platforms like Netlify
+1. **Daily Checks**: Sites check for package updates daily at 2 AM
+2. **Pull Request Creation**: When updates are found, a PR is automatically created
+3. **Build Validation**: The PR includes a test build to ensure compatibility
+4. **Auto-merge Option**: PRs can be configured to auto-merge if all checks pass
+5. **Manual Review**: Alternatively, PRs can be reviewed manually before merging
 
-## Setup for New Sites
+## Setup for Client Sites
 
-To enable auto-updates for a new site:
+To enable automatic updates in a client site:
 
-### 1. Add the site to the dispatch list
+### 1. Add the workflow file
 
-Edit `.github/workflows/publish.yml` and add a new dispatch step:
+Create `.github/workflows/update-package.yml` in your site repository:
 
 ```yaml
-- name: Trigger YOUR-SITE-NAME update
-  if: env.VERSION != ''
-  uses: peter-evans/repository-dispatch@v2
-  with:
-    token: ${{ secrets.DISPATCH_TOKEN || secrets.GITHUB_TOKEN }}
-    repository: mcoster/YOUR-SITE-REPO
-    event-type: package-update
-    client-payload: '{"package": "@mcoster/astro-local-package", "version": "${{ env.VERSION }}"}'
+name: Check for Package Updates
+
+on:
+  schedule:
+    # Run daily at 2 AM
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+    inputs:
+      auto_merge:
+        description: 'Auto-merge PR if tests pass'
+        required: false
+        default: 'true'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
+
+# ... (full workflow in gold-coast-roof-cleaning-pros repository)
 ```
 
-### 2. Add the update workflow to the site
+### 2. Configure auto-merge (optional)
 
-Create `.github/workflows/update-package.yml` in the site repository with the workflow from this repository's examples.
+To enable automatic merging of update PRs:
+- The workflow includes auto-merge by default for scheduled runs
+- Manual runs can choose whether to auto-merge
+- PRs will only merge if the build test passes
 
-### 3. (Optional) Add Personal Access Token
+### 3. Manual trigger
 
-If updating private repositories, create a Personal Access Token with `repo` scope and add it as `DISPATCH_TOKEN` secret in this repository's settings.
+You can also manually check for updates:
+1. Go to Actions tab in your repository
+2. Select "Check for Package Updates"
+3. Click "Run workflow"
+4. Choose whether to auto-merge
 
-## Locking a Site to a Specific Version
+## Customization Options
 
-To prevent a site from auto-updating:
+### Disable auto-merge
 
-1. **Option 1**: Don't add the update workflow to that site
-2. **Option 2**: Change the package.json to use a specific version tag:
-   ```json
-   "@mcoster/astro-local-package": "github:mcoster/astro-local-package#v1.0.7"
-   ```
+To require manual review of all updates, change the default in the workflow:
 
-## Manual Updates
+```yaml
+auto_merge:
+  description: 'Auto-merge PR if tests pass'
+  required: false
+  default: 'false'  # Changed from 'true'
+```
 
-Sites can also be updated manually:
+### Change schedule
 
-1. Via GitHub Actions UI: Go to Actions → "Update NPM Package" → Run workflow
-2. Via command line: `npm update @mcoster/astro-local-package`
+Modify the cron expression to run at different times:
 
-## Rollback on Failure
+```yaml
+schedule:
+  - cron: '0 6 * * 1'  # Weekly on Monday at 6 AM
+```
 
-If a build fails:
-- Netlify keeps the current live site unchanged
-- The failed update commit stays in git history
-- To fix: Either fix the package issue or revert the package-lock.json commit
+### Lock to specific version
+
+To prevent automatic updates, use a specific version in package.json:
+
+```json
+"@mcoster/astro-local-package": "github:mcoster/astro-local-package#v1.0.8"
+```
+
+## Benefits
+
+- **Safety**: PRs allow review before merging
+- **Automation**: Reduces manual update work
+- **Visibility**: Clear PR descriptions show what's changing
+- **Flexibility**: Can auto-merge or require manual review
+- **Testing**: Build validation prevents broken deployments
 
 ## Monitoring
 
-- Check GitHub Actions tab for workflow runs
-- Failed updates will show as failed workflows
-- Successful updates trigger Netlify deployments automatically
+- Check the Actions tab for workflow runs
+- Review PRs in the Pull Requests tab
+- Failed builds will prevent auto-merge
+- Netlify will automatically deploy merged PRs
+
+## Rollback
+
+If an update causes issues:
+1. Revert the merge commit
+2. Or manually downgrade in package.json
+3. The site will redeploy with the previous version
