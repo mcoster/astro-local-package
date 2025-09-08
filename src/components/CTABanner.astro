@@ -37,9 +37,9 @@ const backgroundStyle = variant === 'image' && backgroundImage
   <div class="cta-banner__overlay"></div>
   <div class="cta-banner__container container mx-auto px-4 max-w-6xl">
     <div class="cta-banner__content">
-      <h2 class="cta-banner__heading">{heading}</h2>
+      <h2 class="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 text-white">{heading}</h2>
       {description && (
-        <p class="cta-banner__description">{description}</p>
+        <p class="text-lg md:text-xl text-white/95 mb-8 max-w-3xl mx-auto">{description}</p>
       )}
       <div class="cta-banner__buttons">
         <a href={buttonHref} class="btn-cta-primary">
@@ -109,40 +109,7 @@ const backgroundStyle = variant === 'image' && backgroundImage
     color: white;
   }
 
-  .cta-banner__heading {
-    font-size: 2rem;
-    font-weight: bold;
-    margin-bottom: 1rem;
-    line-height: 1.2;
-  }
-
-  @media (min-width: 768px) {
-    .cta-banner__heading {
-      font-size: 2.5rem;
-    }
-  }
-
-  @media (min-width: 1024px) {
-    .cta-banner__heading {
-      font-size: 3rem;
-    }
-  }
-
-  .cta-banner__description {
-    font-size: 1.125rem;
-    margin-bottom: 2rem;
-    opacity: 0.95;
-    max-width: 50rem;
-    margin-left: auto;
-    margin-right: auto;
-    line-height: 1.6;
-  }
-
-  @media (min-width: 768px) {
-    .cta-banner__description {
-      font-size: 1.25rem;
-    }
-  }
+  /* Heading and description styles now using Tailwind classes */
 
   .cta-banner__buttons {
     display: flex;

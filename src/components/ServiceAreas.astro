@@ -37,9 +37,9 @@ const displayLocations = showAllAreas ? locations : locations.slice(0, limit);
 <Section variant={variant} className={`service-areas ${className}`}>
   <div class="service-areas__container">
     <div class="service-areas__header">
-      <h2 class="service-areas__heading">{heading}</h2>
+      <h2 class="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 text-gray-900">{heading}</h2>
       {subtitle && (
-        <p class="service-areas__subtitle">{subtitle}</p>
+        <p class="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">{subtitle}</p>
       )}
     </div>
     
@@ -96,26 +96,7 @@ const displayLocations = showAllAreas ? locations : locations.slice(0, limit);
     margin-bottom: 3rem;
   }
 
-  .service-areas__heading {
-    font-size: 2rem;
-    font-weight: bold;
-    margin-bottom: 1rem;
-    color: var(--color-primary, #1f2937);
-    line-height: 1.2;
-  }
-
-  @media (min-width: 768px) {
-    .service-areas__heading {
-      font-size: 2.5rem;
-    }
-  }
-
-  .service-areas__subtitle {
-    font-size: 1.125rem;
-    color: #6b7280;
-    max-width: 40rem;
-    margin: 0 auto;
-  }
+  /* Heading and subtitle styles now using Tailwind classes */
 
   .service-areas__content {
     margin-bottom: 3rem;
