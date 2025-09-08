@@ -36,7 +36,8 @@
     "rehype-raw": "^7.0.0",
     "remark": "^15.0.1",
     "js-yaml": "^4.1.0",
-    "dotenv": "^17.2.2"
+    "dotenv": "^17.2.2",
+    "pg": "^8.16.3"
   },
   "devDependencies": {
     "@types/node": "^20.11.5",

@@ -1,8 +1,8 @@
 ---
-import { siteConfig } from '@/config/site';
+import { siteConfig } from '../config/site';
 import { getCollection } from 'astro:content';
-import { getCachedFooterLocations } from '@/lib/footer-locations';
-import MapEmbed from '@/components/MapEmbed.astro';
+import { getCachedFooterLocations } from '../utils/footer-locations';
+import MapEmbed from './MapEmbed.astro';
 
 const currentYear = new Date().getFullYear();
 

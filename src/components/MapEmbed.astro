@@ -1,6 +1,6 @@
 ---
-import { getCachedMapEmbedConfig, generateEmbedUrl } from '@/lib/google-places';
-import { siteConfig } from '@/config/site';
+import { getCachedMapEmbedConfig, generateEmbedUrl } from '../utils/google-places';
+import { siteConfig } from '../config/site';
 
 // Get the cached map configuration (computed only once per build)
 const mapConfig = await getCachedMapEmbedConfig();

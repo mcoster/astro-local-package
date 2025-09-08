@@ -1,8 +1,8 @@
 ---
 import { Image } from 'astro:assets';
-import { imageRegistry } from '@/lib/image-registry';
-import { generatePlaceholder } from '@/lib/image-placeholders';
-import { getAltText } from '@/lib/image-alt-generator';
+import { imageRegistry } from '../utils/image-registry';
+import { generatePlaceholder } from '../utils/image-placeholders';
+import { getAltText } from '../utils/image-alt-generator';
 
 export interface Props {
   src?: string;
