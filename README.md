@@ -2,6 +2,8 @@
 
 A reusable package of Astro components and utilities for building local service provider websites with automatic updates, smart image handling, and location-based content generation.
 
+**Current Version:** 1.0.5
+
 ## Features
 
 - 🚀 **Pre-built Components**: Hero sections, service grids, contact forms, and more
@@ -14,7 +16,25 @@ A reusable package of Astro components and utilities for building local service 
 
 ## Installation
 
-### Using GitHub Packages
+### Option 1: Using GitHub Directly (Recommended)
+
+Install directly from GitHub repository (no authentication required):
+
+```bash
+npm install github:mcoster/astro-local-package#main
+```
+
+Or add to your `package.json`:
+
+```json
+{
+  "dependencies": {
+    "@mcoster/astro-local-package": "github:mcoster/astro-local-package#main"
+  }
+}
+```
+
+### Option 2: Using NPM Registry
 
 1. Create a `.npmrc` file in your project root:
 
@@ -309,6 +329,15 @@ const locations = await generateLocations(config);
 2. Create a feature branch
 3. Make your changes
 4. Submit a pull request
+
+## Changelog
+
+See [CHANGELOG.md](./CHANGELOG.md) for detailed release notes.
+
+### Latest Updates (v1.0.5)
+- Fixed footer duplicate location links issue
+- Improved location filtering logic
+- Better handling of main location in footer
 
 ## License
 
