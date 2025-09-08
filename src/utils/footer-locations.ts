@@ -3,11 +3,24 @@
  * Manages selection of suburbs to display in the site footer for SEO discovery
  */
 
-import { getSuburbsWithPopulation, getSuburbsByName } from './locations';
+// Use static suburbs data if database is not configured or USE_STATIC_SUBURBS is set
+import * as staticSuburbs from './static-suburbs';
+import * as dynamicSuburbs from './locations';
 import { getCenterLocation, generateLocationSlug, generateLocationUrl } from './location-builder';
 import { siteConfig } from '../config/site';
 import type { SuburbWithPopulation, Suburb } from './locations';
 import type { LocationPageData } from './location-builder';
+
+// Check if we should use static data (same logic as location-builder.ts)
+const useStaticData = !import.meta.env.POSTGIS_HOST || 
+                      import.meta.env.POSTGIS_HOST === 'localhost' ||
+                      import.meta.env.USE_STATIC_SUBURBS === 'true';
+
+// Select the appropriate module
+const suburbsModule = useStaticData ? staticSuburbs : dynamicSuburbs;
+const { getSuburbsWithPopulation, getSuburbsByName } = suburbsModule;
+
+console.log(`[Footer] Using ${useStaticData ? 'static JSON' : 'PostGIS database'} for suburb data`);
 
 export interface FooterLocationData {
   suburb: SuburbWithPopulation;
