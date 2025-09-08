@@ -106,20 +106,20 @@ const backgroundAltText = getAltText(undefined, backgroundImage, 'Hero backgroun
 
 <style>
   .hero-section {
-    min-height: 500px;
+    @apply min-h-[500px];
   }
   
   @media (min-width: 768px) {
     .hero-section {
-      min-height: 600px;
+      @apply md:min-h-[600px];
     }
   }
   
   /* Fallback gradient when no image is provided */
   .hero-fallback-bg {
     background: linear-gradient(135deg, 
-      var(--color-primary, #4f46e5) 0%, 
-      var(--color-secondary, #7c3aed) 100%);
+      var(--color-primary) 0%, 
+      var(--color-secondary, var(--color-primary)) 100%);
     transition: opacity 0.3s ease;
   }
   

@@ -6,6 +6,8 @@ export interface Props {
   showOnScroll?: boolean;
   position?: 'bottom-right' | 'bottom-left' | 'bottom-center';
   className?: string;
+  scrollThreshold?: number;
+  zIndex?: number;
 }
 
 const {
@@ -13,6 +15,8 @@ const {
   showOnScroll = true,
   position = 'bottom-right',
   className = '',
+  scrollThreshold = 200,
+  zIndex = 40,
 } = Astro.props;
 
 const formattedPhone = siteConfig.formattedPhone;
@@ -21,6 +25,8 @@ const formattedPhone = siteConfig.formattedPhone;
 <div 
   class={`floating-cta floating-cta--${position} ${showOnScroll ? 'floating-cta--scroll' : ''} ${className}`}
   data-show-on-scroll={showOnScroll}
+  data-scroll-threshold={scrollThreshold}
+  style={`z-index: ${zIndex};`}
 >
   <a 
     href={`tel:${formattedPhone}`} 
@@ -51,7 +57,7 @@ const formattedPhone = siteConfig.formattedPhone;
     }
     
     let isVisible = false;
-    const scrollThreshold = 200; // Show after scrolling 200px
+    const scrollThreshold = parseInt(floatingCTA.dataset.scrollThreshold || '200')
     
     const handleScroll = () => {
       const shouldShow = window.scrollY > scrollThreshold;
@@ -87,7 +93,7 @@ const formattedPhone = siteConfig.formattedPhone;
 <style>
   .floating-cta {
     position: fixed;
-    z-index: 40; /* Reduced to avoid overlapping modals/dropdowns */
+    /* z-index set via inline style */
     opacity: 0;
     visibility: hidden;
     transform: translateY(100px);

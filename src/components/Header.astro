@@ -2,6 +2,20 @@
 import { siteConfig } from '../config/site';
 import { getCollection } from 'astro:content';
 
+export interface Props {
+  headerHeight?: string;
+  scrolledHeight?: string;
+  logoHeight?: string;
+  scrolledLogoHeight?: string;
+}
+
+const {
+  headerHeight = '5rem',
+  scrolledHeight = '4rem',
+  logoHeight = '3.5rem',
+  scrolledLogoHeight = '2.5rem',
+} = Astro.props;
+
 // Get all services from content collection
 const services = await getCollection('services');
 const sortedServices = services.sort((a, b) => (a.data.order || 999) - (b.data.order || 999));
@@ -16,7 +30,7 @@ const navItems = [
 const currentPath = Astro.url.pathname;
 ---
 
-<header id="main-header" class="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 transition-all duration-300">
+<header id="main-header" class="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 transition-all duration-300" style={`--header-height: ${headerHeight}; --scrolled-header-height: ${scrolledHeight}; --logo-height: ${logoHeight}; --scrolled-logo-height: ${scrolledLogoHeight};`}>
   <div class="max-w-7xl mx-auto px-4">
     <div class="header-content flex items-center justify-between transition-all duration-300">
       <!-- Logo/Business Name -->
@@ -233,20 +247,20 @@ const currentPath = Astro.url.pathname;
   
   /* Default header height */
   .header-content {
-    height: 5rem; /* 80px */
+    height: var(--header-height, 5rem);
   }
   
   .logo-img {
-    height: 3.5rem; /* 56px */
+    height: var(--logo-height, 3.5rem);
   }
   
   /* Shrunken header when scrolled */
   #main-header.scrolled .header-content {
-    height: 4rem; /* 64px */
+    height: var(--scrolled-header-height, 4rem);
   }
   
   #main-header.scrolled .logo-img {
-    height: 2.5rem; /* 40px */
+    height: var(--scrolled-logo-height, 2.5rem);
   }
   
   /* Dropdown functionality */
@@ -270,7 +284,7 @@ const currentPath = Astro.url.pathname;
   }
   
   .service-link:hover {
-    background-color: rgb(243 244 246);
+    background-color: rgb(243 244 246 / 1); /* bg-gray-100 */
     color: var(--color-primary);
   }
   
