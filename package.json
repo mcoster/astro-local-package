@@ -1,6 +1,6 @@
 {
   "name": "@mcoster/astro-local-package",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Reusable Astro components and utilities for local service provider websites",
   "type": "module",
   "main": "./src/index.ts",
