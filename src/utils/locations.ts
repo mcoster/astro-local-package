@@ -111,10 +111,10 @@ function calculateDirection(fromLat: number, fromLng: number, toLat: number, toL
  * This is a placeholder - in production, you'd use a geocoding service
  */
 export async function geocodeAddress(address: string): Promise<{ lat: number; lng: number } | null> {
-  // For now, return Adelaide CBD coordinates as default
+  // Return null - the project should configure center coordinates in business.yaml
   // In production, integrate with a geocoding service like Google Maps Geocoding API
-  console.warn('Geocoding not implemented. Using default Adelaide CBD coordinates.');
-  return { lat: -34.9285, lng: 138.6007 };
+  console.warn('Geocoding not implemented. Please configure center coordinates in your business.yaml or environment variables.');
+  return null;
 }
 
 /**

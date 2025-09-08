@@ -43,15 +43,23 @@ export async function getCenterLocation(): Promise<{ lat: number; lng: number }>
     };
   }
   
-  // If using static data, use the center from the JSON file
+  // If using static data, try to load center from the project's JSON file
   if (useStaticData) {
     try {
-      const suburbsData = await import('../data/suburbs.json');
-      if (suburbsData.default?.center) {
-        return suburbsData.default.center;
+      // Try to load from project's suburbs.json
+      const { existsSync, readFileSync } = await import('node:fs');
+      const { join } = await import('node:path');
+      const projectSuburbsPath = join(process.cwd(), 'src', 'data', 'suburbs.json');
+      
+      if (existsSync(projectSuburbsPath)) {
+        const fileContent = readFileSync(projectSuburbsPath, 'utf-8');
+        const suburbsData = JSON.parse(fileContent);
+        if (suburbsData.center) {
+          return suburbsData.center;
+        }
       }
     } catch (error) {
-      console.warn('Could not load center from suburbs.json:', error);
+      console.warn('Could not load center from project suburbs.json:', error);
     }
   }
   
@@ -63,9 +71,9 @@ export async function getCenterLocation(): Promise<{ lat: number; lng: number }>
     return geocoded;
   }
   
-  // Default to Adelaide CBD if all else fails
-  console.warn('Could not determine center location, using Adelaide CBD defaults');
-  return { lat: -34.9285, lng: 138.6007 };
+  // If we still can't determine the location, throw an error
+  // The project must configure center coordinates properly
+  throw new Error('Could not determine center location. Please configure center_lat and center_lng in your business.yaml or set SERVICE_CENTER_LAT and SERVICE_CENTER_LNG environment variables.');
 }
 
 /**
@@ -93,7 +101,7 @@ export function generateLocationSlug(suburb: Suburb): string {
  * Returns homepage URL if suburb matches the main location
  */
 export function generateLocationUrl(suburb: Suburb): string {
-  // Check if this is the main location (e.g., Adelaide)
+  // Check if this is the main location
   const mainLocation = import.meta.env.PUBLIC_MAIN_LOCATION || '';
   if (mainLocation && suburb.name.toLowerCase() === mainLocation.toLowerCase()) {
     return '/';

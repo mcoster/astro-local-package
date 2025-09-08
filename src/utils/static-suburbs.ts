@@ -1,33 +1,52 @@
 /**
  * Static Suburbs Data Module
- * Reads suburb data from pre-generated JSON file for production builds
+ * Reads suburb data from the project's pre-generated JSON file
  */
 
-import suburbsData from '../data/suburbs.json';
+import { existsSync, readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import type { Suburb, SuburbWithPopulation } from './locations';
 
 // Cache the loaded data
 let cachedSuburbs: Suburb[] | null = null;
 
 /**
- * Load suburbs from static JSON file
+ * Load suburbs from the project's static JSON file
  */
 function loadSuburbs(): Suburb[] {
   if (cachedSuburbs) {
     return cachedSuburbs;
   }
 
-  cachedSuburbs = suburbsData.suburbs.map(s => ({
-    id: s.id,
-    name: s.name,
-    postcode: s.postcode || undefined,
-    state: s.state,
-    latitude: s.latitude,
-    longitude: s.longitude,
-    distanceKm: s.distanceKm,
-    direction: s.direction,
-  }));
+  try {
+    // Try to load from the project's src/data/suburbs.json
+    const projectSuburbsPath = join(process.cwd(), 'src', 'data', 'suburbs.json');
+    
+    if (existsSync(projectSuburbsPath)) {
+      const fileContent = readFileSync(projectSuburbsPath, 'utf-8');
+      const suburbsData = JSON.parse(fileContent);
+      
+      cachedSuburbs = suburbsData.suburbs.map((s: any) => ({
+        id: s.id,
+        name: s.name,
+        postcode: s.postcode || undefined,
+        state: s.state,
+        latitude: s.latitude,
+        longitude: s.longitude,
+        distanceKm: s.distanceKm,
+        direction: s.direction,
+      }));
+      
+      console.log(`Loaded ${cachedSuburbs.length} suburbs from project's suburbs.json`);
+      return cachedSuburbs;
+    }
+  } catch (error) {
+    console.error('Error loading suburbs.json from project:', error);
+  }
 
+  // Return empty array if no data found
+  console.warn('No suburbs.json found in project. Please generate suburbs data using export-suburbs.ts');
+  cachedSuburbs = [];
   return cachedSuburbs;
 }
 
@@ -146,9 +165,10 @@ export async function getSuburbsWithPopulation(
   const suburbs = await getSuburbsWithinRadius(centerLat, centerLng, radiusKm);
   
   // Map to include population fields (even if null)
+  // The project's suburbs.json may include population data
   return suburbs.map(suburb => ({
     ...suburb,
-    population: (suburbsData.suburbs.find(s => s.id === suburb.id) as any)?.population || undefined,
+    population: undefined,
     populationDensity: undefined,
     households: undefined,
     medianAge: undefined,
@@ -163,9 +183,9 @@ export async function closePool(): Promise<void> {
 }
 
 /**
- * Geocode placeholder - returns Adelaide CBD coordinates
+ * Geocode placeholder - returns null as we cannot geocode without external service
  */
 export async function geocodeAddress(address: string): Promise<{ lat: number; lng: number } | null> {
-  console.warn('Geocoding not available with static data. Using default Adelaide CBD coordinates.');
-  return { lat: -34.9285, lng: 138.6007 };
+  console.warn('Geocoding not available with static data. Please configure center coordinates in your business.yaml or environment variables.');
+  return null;
 }
