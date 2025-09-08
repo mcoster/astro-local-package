@@ -10,8 +10,12 @@ const currentYear = new Date().getFullYear();
 const services = await getCollection('services');
 const sortedServices = services.sort((a, b) => a.data.order - b.data.order);
 
-// Get footer locations (11 suburbs)
-const footerLocations = await getCachedFooterLocations();
+// Get footer locations (11 suburbs) and filter out the main location to avoid duplication
+const allFooterLocations = await getCachedFooterLocations();
+// Filter out the main location if it's in the list (e.g., Adelaide) since we link to it separately
+const footerLocations = allFooterLocations.filter(
+  location => location.suburb.name !== siteConfig.mainLocation
+);
 
 const quickLinks = [
   { label: 'Home', href: '/', title: 'Go to Adelaide Roof Cleaning Pros homepage' },
