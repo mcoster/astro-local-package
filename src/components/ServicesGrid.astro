@@ -113,70 +113,95 @@ const gridClass = layout === 'auto'
 
 <style>
   .services-section {
-    @apply py-16 bg-gray-50;
+    padding-top: 4rem;
+    padding-bottom: 4rem;
+    background-color: rgb(249 250 251);
   }
 
   @media (min-width: 768px) {
     .services-section {
-      @apply md:py-24;
+      padding-top: 6rem;
+      padding-bottom: 6rem;
     }
   }
 
   .container {
-    @apply max-w-7xl mx-auto px-4;
+    max-width: 80rem;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1rem;
+    padding-right: 1rem;
   }
 
   @media (min-width: 640px) {
     .container {
-      @apply sm:px-6;
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
     }
   }
 
   @media (min-width: 1024px) {
     .container {
-      @apply lg:px-8;
+      padding-left: 2rem;
+      padding-right: 2rem;
     }
   }
 
   .services-header {
-    @apply text-center mb-12;
+    text-align: center;
+    margin-bottom: 3rem;
   }
 
   @media (min-width: 768px) {
     .services-header {
-      @apply md:mb-16;
+      margin-bottom: 4rem;
     }
   }
 
   .services-title {
-    @apply text-3xl font-bold text-gray-900 mb-4;
+    font-size: 1.875rem;
+    line-height: 2.25rem;
+    font-weight: 700;
+    color: rgb(17 24 39);
+    margin-bottom: 1rem;
   }
 
   @media (min-width: 768px) {
     .services-title {
-      @apply md:text-4xl;
+      font-size: 2.25rem;
+      line-height: 2.5rem;
     }
   }
 
   @media (min-width: 1024px) {
     .services-title {
-      @apply lg:text-5xl;
+      font-size: 3rem;
+      line-height: 1;
     }
   }
 
   .services-subtitle {
-    @apply text-lg text-gray-600 max-w-2xl mx-auto;
+    font-size: 1.125rem;
+    line-height: 1.75rem;
+    color: rgb(75 85 99);
+    max-width: 42rem;
+    margin-left: auto;
+    margin-right: auto;
   }
 
   @media (min-width: 768px) {
     .services-subtitle {
-      @apply md:text-xl;
+      font-size: 1.25rem;
+      line-height: 1.75rem;
     }
   }
 
   /* Flexbox base layout */
   .services-grid {
-    @apply flex flex-wrap gap-6 justify-center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    justify-content: center;
   }
 
   /* Auto layout - cards size themselves based on available space */
@@ -248,7 +273,7 @@ const gridClass = layout === 'auto'
 
   @media (max-width: 640px) {
     .services-grid {
-      @apply gap-4;
+      gap: 1rem;
     }
     
     .services-grid :global(.service-card) {
@@ -258,11 +283,15 @@ const gridClass = layout === 'auto'
   }
   
   .services-footer {
-    @apply text-center mt-12;
+    text-align: center;
+    margin-top: 3rem;
   }
   
   .btn-view-all {
-    @apply inline-flex items-center gap-2 px-7 py-3.5;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.875rem 1.75rem;
     background-color: var(--color-primary, #3b82f6);
     color: white;
     border-radius: 0.375rem;
@@ -273,7 +302,7 @@ const gridClass = layout === 'auto'
   
   .btn-view-all:hover {
     background-color: var(--color-primary-dark, #2563eb);
-    @apply gap-3;
+    gap: 0.75rem;
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   }
