@@ -83,3 +83,12 @@ jobs:
             Full Changelog: https://github.com/${{ github.repository }}/commits/v${{ env.VERSION }}
           draft: false
           prerelease: false
+      
+      - name: Trigger dependent site updates
+        if: env.VERSION != ''
+        uses: peter-evans/repository-dispatch@v2
+        with:
+          token: ${{ secrets.DISPATCH_TOKEN || secrets.GITHUB_TOKEN }}
+          repository: mcoster/gold-coast-roof-cleaning-pros
+          event-type: package-update
+          client-payload: '{"package": "@mcoster/astro-local-package", "version": "${{ env.VERSION }}"}'
