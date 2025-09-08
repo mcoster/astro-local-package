@@ -1,0 +1,145 @@
+---
+export interface BreadcrumbItem {
+  label: string;
+  href?: string;
+  current?: boolean;
+}
+
+export interface Props {
+  items: BreadcrumbItem[];
+  className?: string;
+}
+
+const { items, className = '' } = Astro.props;
+
+// Generate breadcrumb schema for SEO
+const breadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": items.map((item, index) => ({
+    "@type": "ListItem",
+    "position": index + 1,
+    "name": item.label,
+    ...(item.href && !item.current ? { "item": new URL(item.href, Astro.url).href } : {})
+  }))
+};
+---
+
+<nav aria-label="Breadcrumb" class={`breadcrumb ${className}`}>
+  <ol class="breadcrumb-list">
+    {items.map((item, index) => (
+      <li class="breadcrumb-item">
+        {item.current ? (
+          <span aria-current="page" class="breadcrumb-current">
+            {item.label}
+          </span>
+        ) : item.href ? (
+          <a href={item.href} class="breadcrumb-link">
+            {item.label}
+          </a>
+        ) : (
+          <span class="breadcrumb-text">{item.label}</span>
+        )}
+        {index < items.length - 1 && (
+          <svg 
+            class="breadcrumb-separator" 
+            fill="currentColor" 
+            viewBox="0 0 20 20" 
+            aria-hidden="true"
+          >
+            <path 
+              fill-rule="evenodd" 
+              d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" 
+              clip-rule="evenodd" 
+            />
+          </svg>
+        )}
+      </li>
+    ))}
+  </ol>
+</nav>
+
+<!-- Breadcrumb Schema -->
+<script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
+
+<style>
+  .breadcrumb {
+    padding: 1rem 0;
+  }
+
+  .breadcrumb-list {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    gap: 0.25rem;
+  }
+
+  .breadcrumb-item {
+    display: flex;
+    align-items: center;
+    font-size: 0.875rem;
+  }
+
+  .breadcrumb-link {
+    color: rgb(59, 130, 246);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .breadcrumb-link:hover {
+    color: rgb(29, 78, 216);
+    text-decoration: underline;
+  }
+
+  .breadcrumb-current,
+  .breadcrumb-text {
+    color: rgb(107, 114, 128);
+  }
+
+  .breadcrumb-current {
+    font-weight: 500;
+  }
+
+  .breadcrumb-separator {
+    width: 1.25rem;
+    height: 1.25rem;
+    margin: 0 0.25rem;
+    color: rgb(156, 163, 175);
+    flex-shrink: 0;
+  }
+
+  /* Mobile adjustments */
+  @media (max-width: 640px) {
+    .breadcrumb-list {
+      font-size: 0.75rem;
+    }
+
+    .breadcrumb-separator {
+      width: 1rem;
+      height: 1rem;
+    }
+  }
+
+  /* Dark mode support (optional) */
+  @media (prefers-color-scheme: dark) {
+    .breadcrumb-link {
+      color: rgb(147, 197, 253);
+    }
+
+    .breadcrumb-link:hover {
+      color: rgb(191, 219, 254);
+    }
+
+    .breadcrumb-current,
+    .breadcrumb-text {
+      color: rgb(209, 213, 219);
+    }
+
+    .breadcrumb-separator {
+      color: rgb(107, 114, 128);
+    }
+  }
+</style>

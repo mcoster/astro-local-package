@@ -1,0 +1,133 @@
+---
+import { siteConfig } from '@/config/site';
+
+export interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+  canonical?: string;
+  noindex?: boolean;
+  type?: 'website' | 'article' | 'product';
+  article?: {
+    publishedTime?: string;
+    modifiedTime?: string;
+    author?: string;
+    section?: string;
+    tags?: string[];
+  };
+  product?: {
+    price?: number;
+    currency?: string;
+    availability?: 'in stock' | 'out of stock' | 'preorder';
+  };
+  schema?: any;
+}
+
+const {
+  title = siteConfig.businessName,
+  description = siteConfig.tagline,
+  image = '/og-image.jpg',
+  canonical,
+  noindex = false,
+  type = 'website',
+  article,
+  product,
+  schema
+} = Astro.props;
+
+// Generate page title
+const pageTitle = title === siteConfig.businessName 
+  ? title 
+  : `${title} | ${siteConfig.businessName}`;
+
+// Generate canonical URL
+const canonicalURL = canonical 
+  ? new URL(canonical, siteConfig.siteUrl)
+  : new URL(Astro.url.pathname, siteConfig.siteUrl);
+
+// Generate absolute image URL
+const imageURL = new URL(image, siteConfig.siteUrl);
+
+// Auto-generate description if not provided
+const metaDescription = description || 
+  `${siteConfig.businessName} - ${siteConfig.tagline}. Serving ${siteConfig.mainLocation} and surrounding areas. Call ${siteConfig.phone} for professional service.`;
+
+// Truncate description to recommended length (155-160 chars)
+const truncatedDescription = metaDescription.length > 160 
+  ? metaDescription.substring(0, 157) + '...'
+  : metaDescription;
+---
+
+<!-- Primary Meta Tags -->
+<title>{pageTitle}</title>
+<meta name="title" content={pageTitle} />
+<meta name="description" content={truncatedDescription} />
+<link rel="canonical" href={canonicalURL} />
+
+<!-- Robots Meta -->
+{noindex && <meta name="robots" content="noindex, nofollow" />}
+{!noindex && <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />}
+
+<!-- Open Graph / Facebook -->
+<meta property="og:type" content={type} />
+<meta property="og:url" content={canonicalURL} />
+<meta property="og:title" content={pageTitle} />
+<meta property="og:description" content={truncatedDescription} />
+<meta property="og:image" content={imageURL} />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:site_name" content={siteConfig.businessName} />
+<meta property="og:locale" content="en_US" />
+
+<!-- Article specific Open Graph tags -->
+{article && (
+  <>
+    {article.publishedTime && <meta property="article:published_time" content={article.publishedTime} />}
+    {article.modifiedTime && <meta property="article:modified_time" content={article.modifiedTime} />}
+    {article.author && <meta property="article:author" content={article.author} />}
+    {article.section && <meta property="article:section" content={article.section} />}
+    {article.tags?.map(tag => <meta property="article:tag" content={tag} />)}
+  </>
+)}
+
+<!-- Product specific Open Graph tags -->
+{product && (
+  <>
+    {product.price && <meta property="product:price:amount" content={product.price.toString()} />}
+    {product.currency && <meta property="product:price:currency" content={product.currency} />}
+    {product.availability && <meta property="product:availability" content={product.availability} />}
+  </>
+)}
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:url" content={canonicalURL} />
+<meta name="twitter:title" content={pageTitle} />
+<meta name="twitter:description" content={truncatedDescription} />
+<meta name="twitter:image" content={imageURL} />
+{siteConfig.social?.twitter && <meta name="twitter:site" content={`@${siteConfig.social.twitter.split('/').pop()}`} />}
+
+<!-- Additional Meta Tags -->
+<meta name="author" content={siteConfig.businessName} />
+<meta name="publisher" content={siteConfig.businessName} />
+<meta name="application-name" content={siteConfig.businessName} />
+<meta name="apple-mobile-web-app-title" content={siteConfig.businessName} />
+<meta name="format-detection" content="telephone=no" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+
+<!-- Theme Color -->
+<meta name="theme-color" content={siteConfig.colors.primary} />
+<meta name="msapplication-TileColor" content={siteConfig.colors.primary} />
+
+<!-- Geographic Meta Tags for Local SEO -->
+<meta name="geo.region" content={`${siteConfig.address.country}-${siteConfig.address.state}`} />
+<meta name="geo.placename" content={siteConfig.address.city} />
+<meta name="geo.position" content="latitude;longitude" />
+<meta name="ICBM" content="latitude, longitude" />
+
+<!-- Custom Schema -->
+{schema && (
+  <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+)}

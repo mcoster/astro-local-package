@@ -1,0 +1,295 @@
+---
+import { siteConfig } from '@/config/site';
+import { getCollection } from 'astro:content';
+
+// Get all services from content collection
+const services = await getCollection('services');
+const sortedServices = services.sort((a, b) => (a.data.order || 999) - (b.data.order || 999));
+
+const navItems = [
+  { label: 'Home', href: '/', title: 'Go to Adelaide Roof Cleaning Pros homepage' },
+  { label: 'About', href: '/about', title: 'Learn about Adelaide Roof Cleaning Pros' },
+  { label: 'Services', href: '/services', hasDropdown: true, title: 'View our roof cleaning services' },
+  { label: 'Contact', href: '/contact', title: 'Contact us for a free roof cleaning quote' },
+];
+
+const currentPath = Astro.url.pathname;
+---
+
+<header id="main-header" class="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 transition-all duration-300">
+  <div class="max-w-7xl mx-auto px-4">
+    <div class="header-content flex items-center justify-between transition-all duration-300">
+      <!-- Logo/Business Name -->
+      <a href="/" class="flex items-center space-x-2" title="Adelaide Roof Cleaning Pros - Home">
+        {siteConfig.businessLogo ? (
+          <img 
+            src={siteConfig.businessLogo} 
+            alt={siteConfig.businessName}
+            class="logo-img w-auto transition-all duration-300"
+          />
+        ) : (
+          <span class="text-xl font-bold text-gray-900">{siteConfig.businessName}</span>
+        )}
+      </a>
+      
+      <!-- Right side container for nav and CTA -->
+      <div class="flex items-center gap-6">
+        <!-- Desktop Navigation -->
+        <nav class="hidden md:flex items-center gap-6">
+          {navItems.map((item) => (
+            item.hasDropdown ? (
+              <div class="relative group">
+                <a
+                  href={item.href}
+                  title={item.title}
+                  class:list={[
+                    'text-base font-medium transition-colors hover:text-primary inline-flex items-center gap-1',
+                    currentPath.startsWith('/services') ? 'text-primary' : 'text-gray-600'
+                  ]}
+                  aria-current={currentPath === item.href ? 'page' : undefined}
+                  aria-expanded="false"
+                  aria-haspopup="true"
+                >
+                  {item.label}
+                  <svg class="w-4 h-4 transition-transform group-hover:rotate-180" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                  </svg>
+                </a>
+                <!-- Dropdown Menu -->
+                <div class="services-dropdown absolute top-full left-0 mt-1 min-w-max opacity-0 invisible transition-all duration-200 transform origin-top scale-95">
+                  <div class="bg-white rounded-lg shadow-xl border border-gray-200">
+                    {sortedServices.map((service) => (
+                      <a
+                        href={`/services/${service.slug}`}
+                        title={`${service.data.title} services in Adelaide`}
+                        class="service-link block whitespace-nowrap transition-colors text-gray-700"
+                        class:list={[
+                          currentPath === `/services/${service.slug}` ? 'text-primary font-medium bg-gray-50' : ''
+                        ]}
+                      >
+                        {service.data.title}
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <a
+                href={item.href}
+                title={item.title}
+                class:list={[
+                  'text-base font-medium transition-colors hover:text-primary',
+                  currentPath === item.href ? 'text-primary' : 'text-gray-600'
+                ]}
+                aria-current={currentPath === item.href ? 'page' : undefined}
+              >
+                {item.label}
+              </a>
+            )
+          ))}
+        </nav>
+        
+          <a
+            href={`tel:${siteConfig.formattedPhone}`}
+            title="Call Adelaide Roof Cleaning Pros for a free quote"
+            class="hidden md:inline-flex items-center justify-center btn-cta-compact"
+          >
+            Call {siteConfig.phone}
+          </a>
+          
+          <!-- Mobile Menu Button -->
+          <button
+            id="mobile-menu-button"
+            type="button"
+            class="md:hidden inline-flex items-center justify-center rounded-md p-2 text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary"
+            aria-expanded="false"
+          >
+            <span class="sr-only">Open main menu</span>
+            <!-- Hamburger icon -->
+            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Mobile Navigation -->
+  <nav id="mobile-menu" class="md:hidden hidden">
+    <div class="space-y-1 px-4 pb-3 pt-2">
+      {navItems.map((item) => (
+        item.hasDropdown ? (
+          <div>
+            <button
+              type="button"
+              class:list={[
+                'w-full flex items-center justify-between rounded-md px-3 py-2 text-base font-medium',
+                currentPath.startsWith('/services')
+                  ? 'bg-primary/10 text-primary'
+                  : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+              ]}
+              aria-expanded="false"
+              data-services-toggle
+            >
+              <span>{item.label}</span>
+              <svg class="w-4 h-4 transition-transform" data-services-icon fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+              </svg>
+            </button>
+            <div class="hidden space-y-1 pl-6 mt-1" data-services-menu>
+              {sortedServices.map((service) => (
+                <a
+                  href={`/services/${service.slug}`}
+                  class:list={[
+                    'block rounded-md px-3 py-2 text-sm font-medium',
+                    currentPath === `/services/${service.slug}`
+                      ? 'bg-primary/10 text-primary'
+                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                  ]}
+                >
+                  {service.data.title}
+                </a>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <a
+            href={item.href}
+            class:list={[
+              'block rounded-md px-3 py-2 text-base font-medium',
+              currentPath === item.href
+                ? 'bg-primary/10 text-primary'
+                : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+            ]}
+            aria-current={currentPath === item.href ? 'page' : undefined}
+          >
+            {item.label}
+          </a>
+        )
+      ))}
+      <a
+        href={`tel:${siteConfig.formattedPhone}`}
+        class="flex items-center justify-center btn-cta-compact"
+      >
+        Call {siteConfig.phone}
+      </a>
+    </div>
+  </nav>
+</header>
+
+<script>
+  // Mobile menu toggle
+  const mobileMenuButton = document.getElementById('mobile-menu-button');
+  const mobileMenu = document.getElementById('mobile-menu');
+  
+  mobileMenuButton?.addEventListener('click', () => {
+    const isExpanded = mobileMenuButton.getAttribute('aria-expanded') === 'true';
+    mobileMenuButton.setAttribute('aria-expanded', (!isExpanded).toString());
+    mobileMenu?.classList.toggle('hidden');
+  });
+
+  // Mobile services dropdown toggle
+  const servicesToggle = document.querySelector('[data-services-toggle]');
+  const servicesMenu = document.querySelector('[data-services-menu]');
+  const servicesIcon = document.querySelector('[data-services-icon]');
+  
+  servicesToggle?.addEventListener('click', () => {
+    const isExpanded = servicesToggle.getAttribute('aria-expanded') === 'true';
+    servicesToggle.setAttribute('aria-expanded', (!isExpanded).toString());
+    servicesMenu?.classList.toggle('hidden');
+    servicesIcon?.classList.toggle('rotate-180');
+  });
+
+  // Header shrink on scroll
+  const header = document.getElementById('main-header');
+  let lastScroll = 0;
+  
+  window.addEventListener('scroll', () => {
+    const currentScroll = window.pageYOffset;
+    
+    if (currentScroll > 50) {
+      header?.classList.add('scrolled');
+    } else {
+      header?.classList.remove('scrolled');
+    }
+    
+    lastScroll = currentScroll;
+  });
+</script>
+
+<style>
+  .text-primary {
+    color: var(--color-primary);
+  }
+  
+  .bg-primary\/10 {
+    background-color: rgb(from var(--color-primary) r g b / 0.1);
+  }
+  
+  .focus\:ring-primary:focus {
+    --tw-ring-color: var(--color-primary);
+  }
+  
+  /* Default header height */
+  .header-content {
+    height: 5rem; /* 80px */
+  }
+  
+  .logo-img {
+    height: 3.5rem; /* 56px */
+  }
+  
+  /* Shrunken header when scrolled */
+  #main-header.scrolled .header-content {
+    height: 4rem; /* 64px */
+  }
+  
+  #main-header.scrolled .logo-img {
+    height: 2.5rem; /* 40px */
+  }
+  
+  /* Dropdown functionality */
+  .services-dropdown {
+    opacity: 0;
+    visibility: hidden;
+    transform: scale(0.95) translateY(-0.5rem);
+  }
+  
+  .group:hover .services-dropdown,
+  .group:focus-within .services-dropdown {
+    opacity: 1;
+    visibility: visible;
+    transform: scale(1) translateY(0);
+  }
+  
+  /* Service link styles using responsive system */
+  .service-link {
+    font-size: var(--text-sm);
+    padding: var(--space-sm) var(--space-md);
+  }
+  
+  .service-link:hover {
+    background-color: rgb(243 244 246);
+    color: var(--color-primary);
+  }
+  
+  .service-link.text-primary {
+    color: var(--color-primary);
+  }
+  
+  /* Dropdown container responsive padding */
+  .services-dropdown > div {
+    padding: var(--space-sm) 0;
+  }
+  
+  /* Dropdown arrow rotation */
+  .group:hover svg {
+    transform: rotate(180deg);
+  }
+  
+  /* Mobile services icon rotation */
+  .rotate-180 {
+    transform: rotate(180deg);
+  }
+</style>

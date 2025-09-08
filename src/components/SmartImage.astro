@@ -1,0 +1,235 @@
+---
+import { Image } from 'astro:assets';
+import { imageRegistry } from '@/lib/image-registry';
+import { generatePlaceholder } from '@/lib/image-placeholders';
+import { getAltText } from '@/lib/image-alt-generator';
+
+export interface Props {
+  src?: string;
+  alt?: string;
+  slotId?: string;
+  width?: number;
+  height?: number;
+  class?: string;
+  loading?: 'eager' | 'lazy';
+  fallback?: 'placeholder' | 'gradient' | 'blur';
+  priority?: 'high' | 'medium' | 'low';
+}
+
+const {
+  src,
+  alt: providedAlt,
+  slotId,
+  width,
+  height,
+  class: className = '',
+  loading = 'lazy',
+  fallback = 'placeholder',
+  priority = 'medium'
+} = Astro.props;
+
+// Try to load the image manifest
+let manifest;
+let matchedImage = src;
+let imageSource: 'user' | 'stock' | 'placeholder' = 'user';
+
+try {
+  manifest = await imageRegistry.loadManifest();
+  
+  if (slotId && manifest.slots[slotId]) {
+    const slot = manifest.slots[slotId];
+    if (slot.matchedImage) {
+      matchedImage = slot.matchedImage;
+      const imageData = manifest.images[slot.matchedImage];
+      imageSource = imageData?.source || 'user';
+    }
+  }
+} catch (error) {
+  // Fallback to provided src or placeholder
+  console.warn('Failed to load image manifest:', error);
+}
+
+// Generate placeholder if no image is available
+let placeholderSrc = null;
+let useLocalImage = false;
+
+if (matchedImage && matchedImage.startsWith('/images/')) {
+  try {
+    // Try to import the local image
+    const images = import.meta.glob<{ default: ImageMetadata }>('/public/images/**/*');
+    const imagePath = `/public${matchedImage}`;
+    
+    if (images[imagePath]) {
+      const imageModule = await images[imagePath]();
+      matchedImage = imageModule.default;
+      useLocalImage = true;
+    }
+  } catch (e) {
+    // Image not found, will use placeholder
+    matchedImage = null;
+  }
+}
+
+// Generate alt text from image path if not provided
+const alt = getAltText(providedAlt, matchedImage || src, 'Image');
+
+// Generate placeholder if needed
+if (!matchedImage) {
+  placeholderSrc = await generatePlaceholder({
+    width: width || 1920,
+    height: height || 1080,
+    text: alt,
+    type: fallback
+  });
+}
+
+// Determine optimal sizes for responsive images
+const sizes = priority === 'high' 
+  ? '100vw' 
+  : priority === 'medium'
+  ? '(max-width: 768px) 100vw, 50vw'
+  : '(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw';
+
+const widths = priority === 'high'
+  ? [640, 768, 1024, 1280, 1536, 1920]
+  : priority === 'medium'
+  ? [640, 768, 1024, 1280]
+  : [640, 768, 1024];
+---
+
+<div class={`smart-image-wrapper ${className}`} data-source={imageSource}>
+  {matchedImage && useLocalImage ? (
+    <Image
+      src={matchedImage}
+      alt={alt}
+      class={`smart-image ${className}`}
+      loading={loading}
+      widths={widths}
+      sizes={sizes}
+      format="webp"
+      quality={85}
+    />
+  ) : matchedImage ? (
+    <img
+      src={matchedImage}
+      alt={alt}
+      class={`smart-image ${className}`}
+      loading={loading}
+      width={width}
+      height={height}
+    />
+  ) : (
+    <div 
+      class={`smart-image-placeholder ${className}`}
+      data-fallback={fallback}
+      style={`background-image: url('${placeholderSrc}')`}
+      role="img"
+      aria-label={alt}
+    >
+      {fallback === 'placeholder' && (
+        <div class="placeholder-content">
+          <svg class="placeholder-icon" width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M19 3H5C3.89543 3 3 3.89543 3 5V19C3 20.1046 3.89543 21 5 21H19C20.1046 21 21 20.1046 21 19V5C21 3.89543 20.1046 3 19 3Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M8.5 10C9.32843 10 10 9.32843 10 8.5C10 7.67157 9.32843 7 8.5 7C7.67157 7 7 7.67157 7 8.5C7 9.32843 7.67157 10 8.5 10Z" fill="currentColor"/>
+            <path d="M21 15L16 10L5 21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span class="placeholder-text">{alt}</span>
+        </div>
+      )}
+    </div>
+  )}
+</div>
+
+<style>
+  .smart-image-wrapper {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .smart-image {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .smart-image-placeholder {
+    width: 100%;
+    height: 100%;
+    min-height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    position: relative;
+  }
+
+  .smart-image-placeholder[data-fallback="gradient"] {
+    background: linear-gradient(135deg, var(--color-primary, #4f46e5) 0%, var(--color-secondary, #7c3aed) 100%);
+  }
+
+  .smart-image-placeholder[data-fallback="blur"] {
+    filter: blur(20px);
+    transform: scale(1.1);
+  }
+
+  .placeholder-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    padding: 2rem;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 0.5rem;
+    color: white;
+  }
+
+  .placeholder-icon {
+    opacity: 0.7;
+  }
+
+  .placeholder-text {
+    font-size: 0.875rem;
+    text-align: center;
+    max-width: 200px;
+    opacity: 0.9;
+  }
+
+  /* Loading state animation */
+  .smart-image-wrapper[data-source="placeholder"] .smart-image-placeholder {
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.7;
+    }
+  }
+
+  /* Debug mode indicator */
+  .smart-image-wrapper[data-source="stock"]::after,
+  .smart-image-wrapper[data-source="placeholder"]::after {
+    content: attr(data-source);
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    padding: 0.25rem 0.5rem;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    font-size: 0.75rem;
+    border-radius: 0.25rem;
+    pointer-events: none;
+    display: none; /* Hidden by default, enable for debugging */
+  }
+
+  /* Enable debug mode with class */
+  .debug .smart-image-wrapper[data-source="stock"]::after,
+  .debug .smart-image-wrapper[data-source="placeholder"]::after {
+    display: block;
+  }
+</style>

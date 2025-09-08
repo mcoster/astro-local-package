@@ -1,0 +1,79 @@
+---
+/**
+ * Section Wrapper Component
+ * Provides consistent section styling with alternating backgrounds
+ */
+
+export interface Props {
+  variant?: 'white' | 'gray' | 'primary' | 'gradient' | 'transparent';
+  className?: string;
+  noPadding?: boolean;
+  id?: string;
+  as?: 'section' | 'div' | 'article';
+}
+
+const { 
+  variant = 'white', 
+  className = '', 
+  noPadding = false,
+  id,
+  as: Component = 'section'
+} = Astro.props;
+
+// Build class list
+const classes = [
+  !noPadding && 'py-12',
+  `section--${variant}`,
+  className
+].filter(Boolean).join(' ');
+---
+
+<Component class={classes} id={id}>
+  <slot />
+</Component>
+
+<style>
+  /* Background variants */
+  .section--white {
+    background-color: white;
+  }
+  
+  .section--gray {
+    background-color: #f9fafb; /* gray-50 */
+  }
+  
+  .section--primary {
+    background: linear-gradient(135deg, var(--color-primary, #3b82f6) 0%, var(--color-primary-dark, #2563eb) 100%);
+    color: white;
+  }
+  
+  .section--gradient {
+    background: linear-gradient(135deg, var(--color-primary, #3b82f6) 0%, var(--color-accent, #dc2626) 100%);
+    color: white;
+  }
+  
+  .section--transparent {
+    background-color: transparent;
+  }
+  
+  /* Ensure proper text color for dark backgrounds */
+  .section--primary :global(*),
+  .section--gradient :global(*) {
+    color: inherit;
+  }
+  
+  .section--primary :global(h1),
+  .section--primary :global(h2),
+  .section--primary :global(h3),
+  .section--primary :global(h4),
+  .section--primary :global(h5),
+  .section--primary :global(h6),
+  .section--gradient :global(h1),
+  .section--gradient :global(h2),
+  .section--gradient :global(h3),
+  .section--gradient :global(h4),
+  .section--gradient :global(h5),
+  .section--gradient :global(h6) {
+    color: white;
+  }
+</style>

@@ -1,0 +1,196 @@
+---
+export interface Props {
+  heading: string;
+  description?: string;
+  buttonText?: string;
+  buttonHref?: string;
+  secondaryButtonText?: string;
+  secondaryButtonHref?: string;
+  backgroundImage?: string;
+  backgroundColor?: string;
+  variant?: 'gradient' | 'solid' | 'image';
+}
+
+const {
+  heading,
+  description,
+  buttonText = 'Get Your Free Quote',
+  buttonHref = '/contact',
+  secondaryButtonText,
+  secondaryButtonHref,
+  backgroundImage,
+  backgroundColor,
+  variant = 'gradient',
+} = Astro.props;
+
+const backgroundStyle = variant === 'image' && backgroundImage
+  ? `background-image: url(${backgroundImage});`
+  : variant === 'solid' && backgroundColor
+  ? `background-color: ${backgroundColor};`
+  : '';
+---
+
+<section 
+  class={`cta-banner cta-banner--${variant}`}
+  style={backgroundStyle}
+>
+  <div class="cta-banner__overlay"></div>
+  <div class="cta-banner__container container mx-auto px-4 max-w-6xl">
+    <div class="cta-banner__content">
+      <h2 class="cta-banner__heading">{heading}</h2>
+      {description && (
+        <p class="cta-banner__description">{description}</p>
+      )}
+      <div class="cta-banner__buttons">
+        <a href={buttonHref} class="btn-cta-primary">
+          {buttonText}
+        </a>
+        {secondaryButtonText && secondaryButtonHref && (
+          <a href={secondaryButtonHref} class="cta-banner__btn-secondary">
+            {secondaryButtonText}
+          </a>
+        )}
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .cta-banner {
+    position: relative;
+    padding: 4rem 0;
+    overflow: hidden;
+  }
+
+  /* Gradient variant (default) */
+  .cta-banner--gradient {
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent, var(--color-secondary, var(--color-primary))) 100%);
+  }
+
+  /* Solid color variant */
+  .cta-banner--solid {
+    background-color: var(--color-primary, #2563eb);
+  }
+
+  /* Image variant */
+  .cta-banner--image {
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+
+  /* Overlay for image variant */
+  .cta-banner__overlay {
+    display: none;
+  }
+
+  .cta-banner--image .cta-banner__overlay {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent, var(--color-secondary, var(--color-primary))) 100%);
+    opacity: 0.9;
+    z-index: 1;
+  }
+
+  .cta-banner__container {
+    position: relative;
+    z-index: 2;
+    max-width: 80rem;
+    margin: 0 auto;
+    padding: 0 1rem;
+  }
+
+  .cta-banner__content {
+    text-align: center;
+    color: white;
+  }
+
+  .cta-banner__heading {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    line-height: 1.2;
+  }
+
+  @media (min-width: 768px) {
+    .cta-banner__heading {
+      font-size: 2.5rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .cta-banner__heading {
+      font-size: 3rem;
+    }
+  }
+
+  .cta-banner__description {
+    font-size: 1.125rem;
+    margin-bottom: 2rem;
+    opacity: 0.95;
+    max-width: 50rem;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.6;
+  }
+
+  @media (min-width: 768px) {
+    .cta-banner__description {
+      font-size: 1.25rem;
+    }
+  }
+
+  .cta-banner__buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  /* Secondary button */
+  .cta-banner__btn-secondary {
+    display: inline-block;
+    padding: 1rem 2rem;
+    border: 2px solid white;
+    border-radius: 0.375rem;
+    font-size: 1.125rem;
+    font-weight: 500;
+    color: white;
+    text-decoration: none;
+    transition: all 150ms ease;
+    background: transparent;
+  }
+
+  .cta-banner__btn-secondary:hover {
+    background: white;
+    color: var(--color-primary, #2563eb);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  .cta-banner__btn-secondary:active {
+    transform: translateY(0);
+  }
+
+  /* Mobile adjustments */
+  @media (max-width: 640px) {
+    .cta-banner {
+      padding: 3rem 0;
+    }
+
+    .cta-banner__buttons {
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .cta-banner__buttons > * {
+      width: 100%;
+      max-width: 20rem;
+      text-align: center;
+    }
+  }
+</style>

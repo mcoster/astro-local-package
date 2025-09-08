@@ -1,0 +1,163 @@
+---
+export interface Props {
+  formTitle?: string;
+  formDescription?: string;
+  submitText?: string;
+  redirectTo?: string;
+  includeServiceField?: boolean;
+}
+
+import { siteConfig } from '@/config/site';
+
+const {
+  formTitle = 'Contact Us',
+  formDescription = 'Fill out the form below and we\'ll get back to you as soon as possible.',
+  submitText = 'Send Message',
+  redirectTo = '/thank-you',
+  includeServiceField = false,
+} = Astro.props;
+---
+
+<div class="contact-form-container bg-white rounded-lg p-6 md:p-8 shadow-lg">
+  <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
+    {formTitle}
+  </h2>
+  {formDescription && (
+    <p class="text-gray-600 mb-6">
+      {formDescription}
+    </p>
+  )}
+  
+  <form
+    name="contact-form"
+    method="POST"
+    data-netlify="true"
+    data-netlify-honeypot="bot-field"
+    action={redirectTo}
+    class="space-y-4"
+  >
+    <!-- Netlify Forms hidden inputs -->
+    <input type="hidden" name="form-name" value="contact-form" />
+    
+    <!-- Honeypot field for spam protection (hidden) -->
+    <div class="hidden">
+      <label>
+        Don't fill this out if you're human: 
+        <input name="bot-field" />
+      </label>
+    </div>
+    
+    <!-- Name Field -->
+    <div>
+      <label for="name" class="block text-sm font-medium text-gray-700 mb-1">
+        Full Name <span class="text-red-500">*</span>
+      </label>
+      <input
+        type="text"
+        id="name"
+        name="name"
+        required
+        class="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-base"
+        placeholder="John Smith"
+      />
+    </div>
+    
+    <!-- Email Field -->
+    <div>
+      <label for="email" class="block text-sm font-medium text-gray-700 mb-1">
+        Email Address <span class="text-red-500">*</span>
+      </label>
+      <input
+        type="email"
+        id="email"
+        name="email"
+        required
+        class="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-base"
+        placeholder="john@example.com"
+      />
+    </div>
+    
+    <!-- Phone Field -->
+    <div>
+      <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">
+        Phone Number <span class="text-red-500">*</span>
+      </label>
+      <input
+        type="tel"
+        id="phone"
+        name="phone"
+        required
+        class="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-base"
+        placeholder="(555) 123-4567"
+      />
+    </div>
+    
+    <!-- Service Type (optional) -->
+    {includeServiceField && (
+      <div>
+        <label for="service" class="block text-sm font-medium text-gray-700 mb-1">
+          Service Needed
+        </label>
+        <select
+          id="service"
+          name="service"
+          class="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-base"
+        >
+          <option value="">Select a service...</option>
+          <option value="general-inquiry">General Inquiry</option>
+          <option value="quote-request">Quote Request</option>
+          <option value="schedule-service">Schedule Service</option>
+          <option value="emergency">Emergency Service</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+    )}
+    
+    <!-- Subject Field -->
+    <div>
+      <label for="subject" class="block text-sm font-medium text-gray-700 mb-1">
+        Subject
+      </label>
+      <input
+        type="text"
+        id="subject"
+        name="subject"
+        class="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-base"
+        placeholder="How can we help you?"
+      />
+    </div>
+    
+    <!-- Message Field -->
+    <div>
+      <label for="message" class="block text-sm font-medium text-gray-700 mb-1">
+        Message <span class="text-red-500">*</span>
+      </label>
+      <textarea
+        id="message"
+        name="message"
+        rows="5"
+        required
+        class="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-base"
+        placeholder="Please provide details about how we can help you..."
+      ></textarea>
+    </div>
+    
+    <!-- Submit Button -->
+    <button
+      type="submit"
+      class="w-full btn-cta-primary text-white font-semibold py-3 px-6 rounded-md transition duration-200"
+    >
+      {submitText}
+    </button>
+    
+    <p class="text-xs text-gray-500 mt-4">
+      <span class="text-red-500">*</span> Required fields
+    </p>
+  </form>
+</div>
+
+<style>
+  .contact-form-container {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+</style>

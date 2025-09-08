@@ -1,0 +1,187 @@
+---
+import { Image } from 'astro:assets';
+import { getAltText } from '@/lib/image-alt-generator';
+
+export interface Props {
+  title: string;
+  description: string;
+  icon?: string;
+  image?: string;
+  href?: string;
+}
+
+const { title, description, icon, image, href } = Astro.props;
+
+// Import image if it's a local path
+let serviceImage;
+if (image && image.startsWith('/images/')) {
+  try {
+    const images = import.meta.glob<{ default: ImageMetadata }>('/public/images/*');
+    const imagePath = `/public${image}`;
+    if (images[imagePath]) {
+      serviceImage = (await images[imagePath]()).default;
+    }
+  } catch (e) {
+    // Fallback to string path if import fails
+    serviceImage = image;
+  }
+} else {
+  serviceImage = image;
+}
+
+// Generate alt text from image path if not provided
+const altText = getAltText(undefined, image, title);
+---
+
+<article class="service-card">
+  {href ? (
+    <a href={href} class="service-card-link">
+      <div class="service-card-inner">
+        {image ? (
+          <div class="service-card-image">
+            {typeof serviceImage === 'object' ? (
+              <Image
+                src={serviceImage}
+                alt={altText}
+                loading="lazy"
+                widths={[320, 640]}
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                format="webp"
+                quality={80}
+              />
+            ) : (
+              <img src={image} alt={altText} loading="lazy" />
+            )}
+          </div>
+        ) : icon ? (
+          <div class="service-card-icon">
+            <span class="icon">{icon}</span>
+          </div>
+        ) : null}
+        <div class="service-card-content">
+          <h3 class="service-card-title">{title}</h3>
+          <p class="service-card-description">{description}</p>
+          <span class="service-card-cta">Learn More →</span>
+        </div>
+      </div>
+    </a>
+  ) : (
+    <div class="service-card-inner">
+      {image ? (
+        <div class="service-card-image">
+          {typeof serviceImage === 'object' ? (
+            <Image
+              src={serviceImage}
+              alt={title}
+              loading="lazy"
+              widths={[320, 640]}
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+              format="webp"
+              quality={80}
+            />
+          ) : (
+            <img src={image} alt={title} loading="lazy" />
+          )}
+        </div>
+      ) : icon ? (
+        <div class="service-card-icon">
+          <span class="icon">{icon}</span>
+        </div>
+      ) : null}
+      <div class="service-card-content">
+        <h3 class="service-card-title">{title}</h3>
+        <p class="service-card-description">{description}</p>
+      </div>
+    </div>
+  )}
+</article>
+
+<style>
+  .service-card {
+    background-color: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    overflow: hidden;
+    transition: all 0.3s;
+  }
+
+  .service-card:hover {
+    box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  }
+
+  .service-card-link {
+    display: block;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .service-card-inner {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .service-card-image {
+    width: 100%;
+    height: 12rem;
+    overflow: hidden;
+    background-color: #f3f4f6;
+  }
+
+  .service-card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .service-card-icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 8rem;
+    background: linear-gradient(to bottom right, #eff6ff, #dbeafe);
+  }
+
+  .service-card-icon .icon {
+    font-size: 3rem;
+    color: #2563eb;
+  }
+
+  .service-card-content {
+    padding: 1.5rem;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .service-card-title {
+    font-size: 1.25rem;
+    font-weight: bold;
+    margin-bottom: 0.75rem;
+    color: #111827;
+  }
+
+  .service-card-description {
+    color: #4b5563;
+    margin-bottom: 1rem;
+    flex-grow: 1;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .service-card-cta {
+    color: #2563eb;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    transition: color 0.2s;
+  }
+
+  .service-card:hover .service-card-cta {
+    color: #1d4ed8;
+    transform: translateX(0.25rem);
+  }
+</style>

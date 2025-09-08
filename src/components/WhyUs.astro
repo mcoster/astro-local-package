@@ -1,0 +1,79 @@
+---
+/**
+ * Why Choose Us Component
+ * Displays reasons to choose the business in a grid layout with checkmarks
+ * 
+ * Can load data from:
+ * 1. Inline props (reasons provided directly)
+ * 2. Service-specific YAML files when serviceSlug is provided
+ */
+
+import fs from 'node:fs';
+import path from 'node:path';
+import yaml from 'js-yaml';
+import Section from './Section.astro';
+
+export interface Props {
+  heading?: string;
+  reasons?: Array<{
+    title: string;
+    description: string;
+  }>;
+  serviceSlug?: string;  // For loading service-specific data
+  variant?: 'white' | 'gray' | 'primary' | 'gradient' | 'transparent';
+  className?: string;
+}
+
+const {
+  heading: inlineHeading,
+  reasons: inlineReasons,
+  serviceSlug,
+  variant = 'white',
+  className = '',
+} = Astro.props;
+
+// Load service-specific data if serviceSlug is provided and no inline data
+let heading = inlineHeading || 'Why Choose Us';
+let reasons = inlineReasons || [];
+
+if (serviceSlug && !inlineReasons) {
+  try {
+    // Try to load from service-specific YAML file
+    const whyChoosePath = path.join(process.cwd(), 'src', 'content', 'services', serviceSlug, 'why-choose.yaml');
+    if (fs.existsSync(whyChoosePath)) {
+      const whyChooseContent = fs.readFileSync(whyChoosePath, 'utf8');
+      const whyChooseData = yaml.load(whyChooseContent) as { heading?: string, reasons: Array<{title: string, description: string}> };
+      heading = whyChooseData.heading || heading;
+      reasons = whyChooseData.reasons || [];
+    }
+  } catch (error) {
+    // Silently fall back to empty reasons array
+    console.debug(`No why-choose.yaml found for service: ${serviceSlug}`);
+  }
+}
+---
+
+<Section variant={variant} className={className}>
+  <div class="container mx-auto px-4">
+    <div class="max-w-4xl mx-auto">
+      {heading && (
+        <h2 class="text-3xl md:text-4xl font-bold mb-8 text-center">{heading}</h2>
+      )}
+      <div class="grid md:grid-cols-2 gap-8">
+        {reasons.map((reason) => (
+          <div class="flex items-start space-x-4">
+            <div class="flex-shrink-0">
+              <svg class="w-8 h-8 text-green-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+            </div>
+            <div>
+              <h3 class="font-semibold text-lg mb-2">{reason.title}</h3>
+              <p class="text-gray-600">{reason.description}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</Section>

@@ -1,0 +1,373 @@
+---
+import { siteConfig } from '@/config/site';
+import '@/styles/global.css';
+
+export interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+  noindex?: boolean;
+}
+
+const {
+  title = siteConfig.businessName,
+  description = siteConfig.tagline,
+  image = '/og-image.jpg',
+  noindex = false,
+} = Astro.props;
+
+const pageTitle = title === siteConfig.businessName ? title : `${title} | ${siteConfig.businessName}`;
+const canonicalURL = new URL(Astro.url.pathname, siteConfig.siteUrl);
+
+// Helper function to parse hours string
+const parseHours = (hoursString: string) => {
+  if (hoursString === 'Closed') return null;
+  const [open, close] = hoursString.split(' - ');
+  return { opens: open, closes: close };
+};
+
+// Generate OpeningHoursSpecification
+const openingHoursSpecification = [
+  { day: 'Monday', hours: siteConfig.hours.monday },
+  { day: 'Tuesday', hours: siteConfig.hours.tuesday },
+  { day: 'Wednesday', hours: siteConfig.hours.wednesday },
+  { day: 'Thursday', hours: siteConfig.hours.thursday },
+  { day: 'Friday', hours: siteConfig.hours.friday },
+  { day: 'Saturday', hours: siteConfig.hours.saturday },
+  { day: 'Sunday', hours: siteConfig.hours.sunday }
+].map(({ day, hours }) => {
+  const parsed = parseHours(hours);
+  return parsed ? {
+    "@type": "OpeningHoursSpecification",
+    "dayOfWeek": day,
+    "opens": parsed.opens,
+    "closes": parsed.closes
+  } : null;
+}).filter(Boolean);
+
+// Local Business Schema for SEO with enhanced features
+const localBusinessSchema = {
+  "@context": "https://schema.org",
+  "@type": "LocalBusiness",
+  "name": siteConfig.businessName,
+  "description": siteConfig.tagline,
+  "url": siteConfig.siteUrl,
+  "telephone": siteConfig.phone,
+  "email": siteConfig.email,
+  "image": new URL('/og-image.jpg', siteConfig.siteUrl).href,
+  "logo": new URL('/logo.png', siteConfig.siteUrl).href,
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": siteConfig.address.street,
+    "addressLocality": siteConfig.address.city,
+    "addressRegion": siteConfig.address.state,
+    "postalCode": siteConfig.address.postcode,
+    "addressCountry": siteConfig.address.country
+  },
+  "openingHoursSpecification": openingHoursSpecification,
+  "areaServed": [
+    // GeoCircle for primary service area (33km radius from Kilburn, Adelaide)
+    {
+      "@type": "GeoCircle",
+      "geoMidpoint": {
+        "@type": "GeoCoordinates",
+        "latitude": -34.8517, // Kilburn, Adelaide coordinates
+        "longitude": 138.5829
+      },
+      "geoRadius": "33000" // 33km in meters (service radius)
+    },
+    // Individual cities/suburbs
+    {
+      "@type": "City",
+      "name": siteConfig.mainLocation
+    }
+  ],
+  "priceRange": "$$",
+  "paymentAccepted": ["Cash", "Credit Card", "Debit Card", "Bank Transfer"],
+  "currenciesAccepted": "AUD",
+  "amenityFeature": [
+    {
+      "@type": "LocationFeatureSpecification",
+      "name": "Free Quotes",
+      "value": true
+    },
+    {
+      "@type": "LocationFeatureSpecification", 
+      "name": "Emergency Service",
+      "value": true
+    }
+  ],
+  "potentialAction": {
+    "@type": "ReserveAction",
+    "target": {
+      "@type": "EntryPoint",
+      "urlTemplate": siteConfig.siteUrl + "/contact",
+      "inLanguage": "en-US",
+      "actionPlatform": [
+        "http://schema.org/DesktopWebPlatform",
+        "http://schema.org/MobileWebPlatform"
+      ]
+    },
+    "result": {
+      "@type": "Reservation",
+      "name": "Request a Quote"
+    }
+  }
+};
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    
+    <!-- Primary Meta Tags -->
+    <title>{pageTitle}</title>
+    <meta name="title" content={pageTitle} />
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalURL} />
+    
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={new URL(image, siteConfig.siteUrl)} />
+    <meta property="og:site_name" content={siteConfig.businessName} />
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content={canonicalURL} />
+    <meta property="twitter:title" content={pageTitle} />
+    <meta property="twitter:description" content={description} />
+    <meta property="twitter:image" content={new URL(image, siteConfig.siteUrl)} />
+    
+    <!-- Theme Colors -->
+    <meta name="theme-color" content={siteConfig.colors.primary} />
+    
+    <!-- Local Business Schema -->
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(localBusinessSchema)} />
+    
+    <!-- Preconnect to external domains -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    
+    <!-- Google Fonts with font-display: swap for better performance -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <slot />
+    
+    <script>
+      // Add smooth scrolling for anchor links
+      document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+          anchor.addEventListener('click', function (this: HTMLAnchorElement, e: Event) {
+            const href = this.getAttribute('href');
+            if (href && href.startsWith('#')) {
+              e.preventDefault();
+              const target = document.querySelector(href);
+              if (target) {
+                // Account for sticky header height
+                const headerOffset = 80;
+                const elementPosition = target.getBoundingClientRect().top;
+                const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+                
+                window.scrollTo({
+                  top: offsetPosition,
+                  behavior: 'smooth'
+                });
+              }
+            }
+          });
+        });
+      });
+    </script>
+  </body>
+</html>
+
+<style is:global define:vars={{ 
+  colorPrimary: siteConfig.colors.primary,
+  colorSecondary: siteConfig.colors.secondary,
+  colorAccent: siteConfig.colors.accent,
+  colorCta: siteConfig.colors.cta,
+  colorCtaHover: import.meta.env.PUBLIC_COLOR_CTA_HOVER 
+    ? `#${import.meta.env.PUBLIC_COLOR_CTA_HOVER}` 
+    : undefined 
+}}>
+  :root {
+    --color-primary: var(--colorPrimary);
+    --color-secondary: var(--colorSecondary);
+    --color-accent: var(--colorAccent);
+    --color-cta: var(--colorCta);
+    --color-cta-hover: var(--colorCtaHover, rgb(from var(--color-cta) r g b / 0.9));
+    
+    /* Shadow definitions */
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 2px 4px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 4px 6px rgba(0, 0, 0, 0.12), 0 2px 4px rgba(0, 0, 0, 0.08);
+    
+    /* Responsive Typography Scale - Mobile First */
+    --text-xs: 0.75rem;    /* 12px */
+    --text-sm: 0.875rem;   /* 14px */
+    --text-base: 1rem;     /* 16px - minimum for mobile */
+    --text-lg: 1.125rem;   /* 18px */
+    --text-xl: 1.25rem;    /* 20px */
+    --text-2xl: 1.5rem;    /* 24px */
+    --text-3xl: 1.875rem;  /* 30px */
+    --text-4xl: 2.25rem;   /* 36px */
+    --text-5xl: 3rem;      /* 48px */
+    
+    /* Responsive Spacing Scale */
+    --space-xs: 0.25rem;   /* 4px */
+    --space-sm: 0.5rem;    /* 8px */
+    --space-md: 1rem;      /* 16px */
+    --space-lg: 1.5rem;    /* 24px */
+    --space-xl: 2rem;      /* 32px */
+    --space-2xl: 3rem;     /* 48px */
+    --space-3xl: 4rem;     /* 64px */
+  }
+  
+  /* Tablet (768px and up) */
+  @media (min-width: 768px) {
+    :root {
+      --text-base: 1rem;     /* Keep 16px base */
+      --text-lg: 1.25rem;    /* 20px */
+      --text-xl: 1.5rem;     /* 24px */
+      --text-2xl: 1.875rem;  /* 30px */
+      --text-3xl: 2.25rem;   /* 36px */
+      --text-4xl: 3rem;      /* 48px */
+      --text-5xl: 3.75rem;   /* 60px */
+      
+      /* Increase spacing on tablets */
+      --space-md: 1.25rem;   /* 20px */
+      --space-lg: 2rem;      /* 32px */
+      --space-xl: 2.5rem;    /* 40px */
+      --space-2xl: 4rem;     /* 64px */
+      --space-3xl: 5rem;     /* 80px */
+    }
+  }
+  
+  /* Desktop (1024px and up) */
+  @media (min-width: 1024px) {
+    :root {
+      --text-base: 1.125rem; /* 18px base for desktop */
+      --text-lg: 1.375rem;   /* 22px */
+      --text-xl: 1.625rem;   /* 26px */
+      --text-2xl: 2rem;      /* 32px */
+      --text-3xl: 2.5rem;    /* 40px */
+      --text-4xl: 3.5rem;    /* 56px */
+      --text-5xl: 4rem;      /* 64px */
+      
+      /* Increase spacing on desktop */
+      --space-lg: 2.5rem;    /* 40px */
+      --space-xl: 3rem;      /* 48px */
+      --space-2xl: 5rem;     /* 80px */
+      --space-3xl: 6rem;     /* 96px */
+    }
+  }
+  
+  /* Base typography - ensure minimum 16px on mobile */
+  html {
+    font-size: 16px; /* Ensure minimum 16px base font */
+  }
+  
+  body {
+    font-size: var(--text-base);
+    line-height: 1.6;
+  }
+  
+  /* Responsive heading sizes */
+  h1 {
+    font-size: var(--text-4xl);
+    line-height: 1.1;
+  }
+  
+  h2 {
+    font-size: var(--text-3xl);
+    line-height: 1.2;
+  }
+  
+  h3 {
+    font-size: var(--text-2xl);
+    line-height: 1.3;
+  }
+  
+  h4 {
+    font-size: var(--text-xl);
+    line-height: 1.4;
+  }
+  
+  h5, h6 {
+    font-size: var(--text-lg);
+    line-height: 1.5;
+  }
+  
+  /* Mobile tap highlighting */
+  a, button, input, textarea, select {
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Ensure touch targets are at least 44x44px */
+  button, a.btn-cta-primary, a.btn-cta-compact, input[type="submit"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Standard CTA button - default size used site-wide */
+  .btn-cta-primary {
+    border-radius: 0.375rem;
+    background-color: var(--color-cta);
+    padding: 1rem 2rem; /* py-4 px-8 */
+    font-size: 1.125rem; /* text-lg */
+    font-weight: 500;
+    color: white;
+    box-shadow: var(--shadow-md);
+    transition: all 150ms ease;
+    cursor: pointer;
+  }
+  
+  .btn-cta-primary:hover {
+    background-color: var(--color-cta-hover);
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-1px);
+  }
+  
+  .btn-cta-primary:active {
+    box-shadow: var(--shadow-sm);
+    transform: translateY(0);
+  }
+  
+  /* Compact CTA button - used in header only */
+  .btn-cta-compact {
+    border-radius: 0.375rem;
+    background-color: var(--color-cta);
+    padding: 0.625rem 1.25rem; /* py-2.5 px-5 */
+    font-size: 1rem; /* text-base */
+    font-weight: 500;
+    color: white;
+    box-shadow: var(--shadow-sm);
+    transition: all 150ms ease;
+    cursor: pointer;
+  }
+  
+  .btn-cta-compact:hover {
+    background-color: var(--color-cta-hover);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-1px);
+  }
+  
+  .btn-cta-compact:active {
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+    transform: translateY(0);
+  }
+</style>

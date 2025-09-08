@@ -1,0 +1,147 @@
+---
+/**
+ * Service FAQ Component
+ * Displays frequently asked questions in an accordion format
+ * 
+ * Can load data from:
+ * 1. Inline props (faqs provided directly)
+ * 2. Service-specific YAML files when serviceSlug is provided
+ */
+
+import fs from 'node:fs';
+import path from 'node:path';
+import yaml from 'js-yaml';
+import Section from './Section.astro';
+
+export interface Props {
+  heading?: string;
+  subtitle?: string;
+  faqs?: Array<{
+    question: string;
+    answer: string;
+  }>;
+  serviceSlug?: string;  // For loading service-specific data
+  variant?: 'white' | 'gray' | 'primary' | 'gradient' | 'transparent';
+  className?: string;
+}
+
+const { 
+  heading: inlineHeading = 'Frequently Asked Questions', 
+  subtitle, 
+  faqs: inlineFaqs,
+  serviceSlug,
+  variant = 'white',
+  className = '' 
+} = Astro.props;
+
+// Load service-specific data if serviceSlug is provided and no inline data
+let faqs = inlineFaqs || [];
+
+if (serviceSlug && !inlineFaqs) {
+  try {
+    // Try to load from service-specific YAML file
+    const faqPath = path.join(process.cwd(), 'src', 'content', 'services', serviceSlug, 'faq.yaml');
+    if (fs.existsSync(faqPath)) {
+      const faqContent = fs.readFileSync(faqPath, 'utf8');
+      const faqData = yaml.load(faqContent) as { faqs: Array<{question: string, answer: string}> };
+      faqs = faqData.faqs || [];
+    }
+  } catch (error) {
+    // Silently fall back to empty FAQs array
+    console.debug(`No faq.yaml found for service: ${serviceSlug}`);
+  }
+}
+
+const heading = inlineHeading;
+---
+
+<Section variant={variant} className={`service-faq ${className}`}>
+  <div class="container mx-auto px-4">
+    <div class="max-w-3xl mx-auto">
+      {(heading || subtitle) && (
+        <div class="text-center mb-12">
+          {heading && (
+            <h2 class="text-3xl md:text-4xl font-bold mb-4">{heading}</h2>
+          )}
+          {subtitle && (
+            <p class="text-lg text-gray-600">{subtitle}</p>
+          )}
+        </div>
+      )}
+      
+      <div class="space-y-6">
+        {faqs.map((faq, index) => (
+          <details class="faq-item group" open={index === 0}>
+            <summary class="faq-question cursor-pointer">
+              <span>{faq.question}</span>
+              <svg 
+                class="faq-icon" 
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
+              >
+                <path 
+                  stroke-linecap="round" 
+                  stroke-linejoin="round" 
+                  stroke-width="2" 
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
+            </summary>
+            <div class="faq-answer">
+              <p>{faq.answer}</p>
+            </div>
+          </details>
+        ))}
+      </div>
+    </div>
+  </div>
+</Section>
+
+<style>
+  .faq-item {
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    overflow: hidden;
+  }
+  
+  .faq-question {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.5rem;
+    font-weight: 600;
+    color: #111827;
+    transition: background-color 0.2s;
+    user-select: none;
+    cursor: pointer;
+  }
+  
+  .faq-question:hover {
+    background-color: #f9fafb;
+  }
+  
+  .faq-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+    color: #6b7280;
+    transition: transform 0.3s;
+    flex-shrink: 0;
+    margin-left: 1rem;
+  }
+  
+  details[open] .faq-icon {
+    transform: rotate(180deg);
+  }
+  
+  .faq-answer {
+    padding: 0 1.5rem 1.5rem 1.5rem;
+    color: #4b5563;
+    line-height: 1.75;
+  }
+  
+  .faq-answer p {
+    white-space: pre-line;
+  }
+</style>

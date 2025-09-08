@@ -1,0 +1,126 @@
+---
+export interface Props {
+  heading: string;
+  subtitle?: string;
+  showMap?: boolean;
+}
+
+const {
+  heading,
+  subtitle,
+  showMap = false,
+} = Astro.props;
+---
+
+<section class="service-areas">
+  <div class="service-areas__container container mx-auto px-4 max-w-6xl">
+    {heading && (
+      <div class="service-areas__header">
+        <h2 class="service-areas__heading">{heading}</h2>
+        {subtitle && (
+          <p class="service-areas__subtitle">{subtitle}</p>
+        )}
+      </div>
+    )}
+    
+    <!-- Custom content slot for location-specific content -->
+    <div class="service-areas__content">
+      <slot />
+    </div>
+  </div>
+</section>
+
+<style>
+  .service-areas {
+    padding: 4rem 0;
+    background: white;
+  }
+
+  .service-areas__container {
+    max-width: 80rem;
+    margin: 0 auto;
+    padding: 0 1rem;
+  }
+
+  .service-areas__header {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  .service-areas__heading {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    color: var(--color-primary, #1f2937);
+    line-height: 1.2;
+  }
+
+  @media (min-width: 768px) {
+    .service-areas__heading {
+      font-size: 2.5rem;
+    }
+  }
+
+  .service-areas__subtitle {
+    font-size: 1.125rem;
+    color: #6b7280;
+    max-width: 40rem;
+    margin: 0 auto;
+  }
+
+  .service-areas__content {
+    max-width: 48rem;
+    margin: 0 auto;
+  }
+  
+  /* Styles for location links in custom content */
+  :global(.service-areas .location-grid) {
+    display: grid;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  }
+  
+  @media (min-width: 640px) {
+    :global(.service-areas .location-grid) {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+  
+  :global(.service-areas .location-grid a) {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    background: #f9fafb;
+    border-radius: 0.375rem;
+    border: 1px solid #e5e7eb;
+    color: #374151;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 200ms ease;
+  }
+  
+  :global(.service-areas .location-grid a:hover) {
+    background: #f3f4f6;
+    border-color: var(--color-primary, #3b82f6);
+    color: var(--color-primary, #3b82f6);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  :global(.service-areas .location-list) {
+    margin-top: 1rem;
+    line-height: 1.8;
+  }
+  
+  :global(.service-areas .location-list a) {
+    color: var(--color-primary, #3b82f6);
+    text-decoration: none;
+    font-weight: 500;
+  }
+  
+  :global(.service-areas .location-list a:hover) {
+    text-decoration: underline;
+  }
+</style>

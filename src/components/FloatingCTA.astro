@@ -1,0 +1,255 @@
+---
+import { siteConfig } from '@/config/site';
+
+export interface Props {
+  phoneNumber?: string;
+  showOnScroll?: boolean;
+  position?: 'bottom-right' | 'bottom-left' | 'bottom-center';
+  className?: string;
+}
+
+const {
+  phoneNumber = siteConfig.phone,
+  showOnScroll = true,
+  position = 'bottom-right',
+  className = '',
+} = Astro.props;
+
+const formattedPhone = siteConfig.formattedPhone;
+---
+
+<div 
+  class={`floating-cta floating-cta--${position} ${showOnScroll ? 'floating-cta--scroll' : ''} ${className}`}
+  data-show-on-scroll={showOnScroll}
+>
+  <a 
+    href={`tel:${formattedPhone}`} 
+    class="floating-cta__button"
+    aria-label={`Call ${phoneNumber}`}
+  >
+    <span class="floating-cta__icon">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" />
+      </svg>
+    </span>
+    <span class="floating-cta__text">{phoneNumber}</span>
+  </a>
+  <div class="floating-cta__pulse"></div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const floatingCTA = document.querySelector('.floating-cta--scroll') as HTMLElement;
+    
+    if (!floatingCTA) return;
+    
+    const showOnScroll = floatingCTA.dataset.showOnScroll === 'true';
+    
+    if (!showOnScroll) {
+      floatingCTA.classList.add('floating-cta--visible');
+      return;
+    }
+    
+    let isVisible = false;
+    const scrollThreshold = 200; // Show after scrolling 200px
+    
+    const handleScroll = () => {
+      const shouldShow = window.scrollY > scrollThreshold;
+      
+      if (shouldShow && !isVisible) {
+        floatingCTA.classList.add('floating-cta--visible');
+        isVisible = true;
+      } else if (!shouldShow && isVisible) {
+        floatingCTA.classList.remove('floating-cta--visible');
+        isVisible = false;
+      }
+    };
+    
+    // Use requestAnimationFrame for better performance
+    let ticking = false;
+    const scrollHandler = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          handleScroll();
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+    
+    window.addEventListener('scroll', scrollHandler, { passive: true });
+    
+    // Check initial scroll position
+    handleScroll();
+  });
+</script>
+
+<style>
+  .floating-cta {
+    position: fixed;
+    z-index: 40; /* Reduced to avoid overlapping modals/dropdowns */
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(100px);
+    transition: all 300ms ease;
+  }
+
+  .floating-cta--visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+
+  /* Position variants */
+  .floating-cta--bottom-right {
+    bottom: 1.5rem;
+    right: 1.5rem;
+  }
+
+  .floating-cta--bottom-left {
+    bottom: 1.5rem;
+    left: 1.5rem;
+  }
+
+  .floating-cta--bottom-center {
+    bottom: 1.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .floating-cta--bottom-center.floating-cta--visible {
+    transform: translateX(-50%) translateY(0);
+  }
+
+  /* Hide on desktop - mobile only component */
+  @media (min-width: 768px) {
+    .floating-cta {
+      display: none;
+    }
+  }
+
+  .floating-cta__button {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background-color: var(--color-cta);
+    color: white;
+    padding: 0.875rem 1.5rem;
+    border-radius: 9999px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transition: all 200ms ease;
+    position: relative;
+  }
+
+  .floating-cta__button:hover {
+    background-color: var(--color-cta-hover);
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+  }
+
+  .floating-cta__button:active {
+    transform: scale(0.98);
+  }
+
+  .floating-cta__icon {
+    display: flex;
+    width: 1.25rem;
+    height: 1.25rem;
+    flex-shrink: 0;
+  }
+
+  .floating-cta__icon svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  .floating-cta__text {
+    white-space: nowrap;
+  }
+
+  /* Pulse animation */
+  .floating-cta__pulse {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 100%;
+    border-radius: 9999px;
+    background-color: var(--color-cta);
+    opacity: 0.4;
+    pointer-events: none;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0% {
+      transform: translate(-50%, -50%) scale(1);
+      opacity: 0.4;
+    }
+    50% {
+      transform: translate(-50%, -50%) scale(1.15);
+      opacity: 0;
+    }
+    100% {
+      transform: translate(-50%, -50%) scale(1.15);
+      opacity: 0;
+    }
+  }
+
+  /* Mobile adjustments - circular button with icon only */
+  @media (max-width: 640px) {
+    .floating-cta--bottom-right,
+    .floating-cta--bottom-left {
+      bottom: 1.5rem;
+      right: 1.5rem;
+      left: auto;
+    }
+
+    .floating-cta--bottom-left {
+      right: auto;
+      left: 1.5rem;
+    }
+
+    .floating-cta__button {
+      width: 3.5rem;
+      height: 3.5rem;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+    }
+
+    .floating-cta__icon {
+      width: 1.5rem;
+      height: 1.5rem;
+      margin: 0;
+    }
+
+    .floating-cta__text {
+      display: none;
+    }
+
+    /* Adjust pulse animation for circular button */
+    .floating-cta__pulse {
+      border-radius: 50%;
+    }
+  }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    .floating-cta {
+      transition: opacity 300ms ease;
+      transform: none !important;
+    }
+
+    .floating-cta__pulse {
+      animation: none;
+      display: none;
+    }
+  }
+</style>

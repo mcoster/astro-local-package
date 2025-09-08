@@ -1,0 +1,101 @@
+---
+import { siteConfig } from '@/config/site';
+
+export interface Props {
+  title?: string;
+  showStatus?: boolean;
+}
+
+const { 
+  title = 'Business Hours',
+  showStatus = true 
+} = Astro.props;
+
+const hours = siteConfig.hours;
+const isOpenNow = siteConfig.isOpenNow;
+
+// Get current day
+const today = new Date().toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase() as keyof typeof hours;
+
+// Define the days in order
+const daysOfWeek = [
+  { key: 'monday', label: 'Monday' },
+  { key: 'tuesday', label: 'Tuesday' },
+  { key: 'wednesday', label: 'Wednesday' },
+  { key: 'thursday', label: 'Thursday' },
+  { key: 'friday', label: 'Friday' },
+  { key: 'saturday', label: 'Saturday' },
+  { key: 'sunday', label: 'Sunday' },
+] as const;
+---
+
+<div class="business-hours container mx-auto px-4 max-w-md">
+  <h3 class="text-xl font-semibold mb-4">{title}</h3>
+  
+  {showStatus && (
+    <div class={`status-badge inline-flex items-center px-3 py-1 rounded-full text-sm font-medium mb-4 ${
+      isOpenNow ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+    }`}>
+      <span class={`w-2 h-2 rounded-full mr-2 ${
+        isOpenNow ? 'bg-green-500' : 'bg-red-500'
+      }`}></span>
+      {isOpenNow ? 'Open Now' : 'Closed'}
+    </div>
+  )}
+  
+  <div class="hours-table">
+    {daysOfWeek.map(({ key, label }) => {
+      const dayHours = hours[key as keyof typeof hours];
+      const isToday = key === today;
+      const isClosed = dayHours === 'Closed';
+      
+      return (
+        <div class={`hours-row flex justify-between py-2 px-3 rounded ${
+          isToday ? 'bg-blue-50 font-semibold' : ''
+        }`}>
+          <span class="day-name text-gray-700">
+            {label}
+            {isToday && <span class="text-blue-600 text-xs ml-2">(Today)</span>}
+          </span>
+          <span class={`day-hours ${isClosed ? 'text-gray-500' : 'text-gray-900'}`}>
+            {dayHours}
+          </span>
+        </div>
+      );
+    })}
+  </div>
+  
+  <div class="mt-4 pt-4 border-t border-gray-200">
+    <p class="text-sm text-gray-600">
+      <strong>Note:</strong> Hours may vary on holidays. Please call ahead to confirm.
+    </p>
+  </div>
+</div>
+
+<style>
+  .business-hours {
+    background: white;
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    margin: 0 auto;
+  }
+  
+  .hours-table {
+    border: 1px solid #e5e7eb;
+    border-radius: 0.375rem;
+    overflow: hidden;
+  }
+  
+  .hours-row:not(:last-child) {
+    border-bottom: 1px solid #e5e7eb;
+  }
+  
+  .hours-row:hover {
+    background-color: #f9fafb;
+  }
+  
+  .hours-row.bg-blue-50:hover {
+    background-color: #dbeafe;
+  }
+</style>

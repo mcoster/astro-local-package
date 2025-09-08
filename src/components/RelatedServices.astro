@@ -1,0 +1,158 @@
+---
+import { getCollection } from 'astro:content';
+import Section from './Section.astro';
+
+export interface Props {
+  heading?: string;
+  subtitle?: string;
+  currentService?: string;
+  limit?: number;
+  showAll?: boolean;
+  variant?: 'white' | 'gray' | 'primary' | 'gradient' | 'transparent';
+  className?: string;
+}
+
+const { 
+  heading = 'Other Services We Offer', 
+  subtitle,
+  currentService,
+  limit = 3,
+  showAll = false,
+  variant = 'gray',
+  className = '' 
+} = Astro.props;
+
+// Get all services
+const allServices = await getCollection('services');
+
+// Filter out current service and sort by order
+const relatedServices = allServices
+  .filter(service => service.slug !== currentService)
+  .sort((a, b) => (a.data.order || 99) - (b.data.order || 99))
+  .slice(0, showAll ? undefined : (limit || undefined));
+---
+
+<Section variant={variant} className={`related-services ${className}`}>
+  <div class="container mx-auto px-4">
+    {(heading || subtitle) && (
+      <div class="text-center mb-12">
+        {heading && (
+          <h2 class="text-3xl md:text-4xl font-bold mb-4">{heading}</h2>
+        )}
+        {subtitle && (
+          <p class="text-lg text-gray-600 max-w-3xl mx-auto">{subtitle}</p>
+        )}
+      </div>
+    )}
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {relatedServices.map((service) => (
+        <a 
+          href={`/services/${service.slug}`}
+          class="service-card group"
+        >
+          <div class="service-card-content">
+            {service.data.icon && (
+              <div class="service-icon">{service.data.icon}</div>
+            )}
+            <h3 class="service-title">{service.data.title}</h3>
+            <p class="service-excerpt">{service.data.excerpt}</p>
+            <span class="service-link">
+              Learn More 
+              <svg 
+                class="inline-block w-4 h-4 ml-1 transition-transform group-hover:translate-x-1" 
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
+              >
+                <path 
+                  stroke-linecap="round" 
+                  stroke-linejoin="round" 
+                  stroke-width="2" 
+                  d="M9 5l7 7-7 7"
+                />
+              </svg>
+            </span>
+          </div>
+        </a>
+      ))}
+    </div>
+    
+    {!showAll && allServices.length > limit + 1 && (
+      <div class="text-center mt-8">
+        <a 
+          href="/#services" 
+          class="inline-flex items-center text-blue-600 hover:text-blue-800 font-semibold"
+        >
+          View All Services
+          <svg 
+            class="w-4 h-4 ml-2" 
+            fill="none" 
+            stroke="currentColor" 
+            viewBox="0 0 24 24"
+          >
+            <path 
+              stroke-linecap="round" 
+              stroke-linejoin="round" 
+              stroke-width="2" 
+              d="M9 5l7 7-7 7"
+            />
+          </svg>
+        </a>
+      </div>
+    )}
+  </div>
+</Section>
+
+<style>
+  .service-card {
+    display: block;
+    background-color: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+    transition: all 0.3s;
+    border: 1px solid #f3f4f6;
+  }
+  
+  .service-card:hover {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    border-color: #bfdbfe;
+  }
+  
+  .service-card-content {
+    padding: 1.5rem;
+  }
+  
+  .service-icon {
+    font-size: 1.875rem;
+    margin-bottom: 0.75rem;
+  }
+  
+  .service-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #111827;
+    transition: color 0.2s;
+  }
+  
+  .group:hover .service-title {
+    color: #2563eb;
+  }
+  
+  .service-excerpt {
+    color: #4b5563;
+    margin-bottom: 1rem;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+  
+  .service-link {
+    color: #2563eb;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+  }
+</style>

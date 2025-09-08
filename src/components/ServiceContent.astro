@@ -1,0 +1,383 @@
+---
+import Section from './Section.astro';
+
+export interface Props {
+  title?: string;
+  variant?: 'white' | 'gray' | 'primary' | 'gradient' | 'transparent';
+  className?: string;
+  startIndex?: number; // For H2 section counting
+  noBackground?: boolean; // Skip Section wrapper for content with own backgrounds
+}
+
+const { title, variant = 'white', className = '', startIndex = 0, noBackground = true } = Astro.props;
+
+// ServiceContent typically contains markdown with H2 sections that have their own backgrounds
+// So we default noBackground to true to avoid double backgrounds
+---
+
+{noBackground ? (
+  <div class={`service-content ${className}`} data-start-index={startIndex}>
+    <div class="container mx-auto px-4">
+      {title && (
+        <h2 class="text-3xl md:text-4xl font-bold mb-8 text-center">{title}</h2>
+      )}
+      <div class="max-w-4xl mx-auto">
+        <article class="prose prose-lg prose-gray max-w-none">
+          <slot />
+        </article>
+      </div>
+    </div>
+  </div>
+) : (
+  <Section variant={variant} className={`service-content ${className}`} data-start-index={startIndex}>
+    <div class="container mx-auto px-4">
+      {title && (
+        <h2 class="text-3xl md:text-4xl font-bold mb-8 text-center">{title}</h2>
+      )}
+      <div class="max-w-4xl mx-auto">
+        <article class="prose prose-lg prose-gray max-w-none">
+          <slot />
+        </article>
+      </div>
+    </div>
+  </Section>
+)}
+
+<style>
+  .prose {
+    color: #374151;
+  }
+  
+  .prose :global(h2) {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-top: 1.5rem;
+    margin-bottom: 0.75rem;
+    color: #111827;
+  }
+  
+  @media (min-width: 768px) {
+    .prose :global(h2) {
+      font-size: 1.875rem;
+    }
+  }
+  
+  .prose :global(h3) {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-top: 1.25rem;
+    margin-bottom: 0.5rem;
+    color: #1f2937;
+  }
+  
+  @media (min-width: 768px) {
+    .prose :global(h3) {
+      font-size: 1.5rem;
+    }
+  }
+  
+  .prose :global(p) {
+    margin-bottom: 1rem;
+    line-height: 1.75;
+  }
+  
+  .prose :global(ul),
+  .prose :global(ol) {
+    margin: 1rem 0;
+    padding-left: 1.5rem;
+  }
+  
+  .prose :global(li) {
+    line-height: 1.75;
+    margin-bottom: 0.5rem;
+  }
+  
+  .prose :global(ul li) {
+    list-style-type: disc;
+  }
+  
+  .prose :global(ol li) {
+    list-style-type: decimal;
+  }
+  
+  .prose :global(strong) {
+    font-weight: 600;
+    color: #111827;
+  }
+  
+  .prose :global(a) {
+    color: #2563eb;
+    text-decoration: underline;
+  }
+  
+  .prose :global(a:hover) {
+    color: #1d4ed8;
+  }
+  
+  .prose :global(blockquote) {
+    border-left: 4px solid #d1d5db;
+    padding-left: 1rem;
+    font-style: italic;
+    margin: 1rem 0;
+  }
+  
+  .prose :global(table) {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.5rem 0;
+  }
+  
+  .prose :global(th),
+  .prose :global(td) {
+    border: 1px solid #d1d5db;
+    padding: 0.5rem 1rem;
+    text-align: left;
+  }
+  
+  .prose :global(th) {
+    background-color: #f9fafb;
+    font-weight: 600;
+  }
+  
+  .prose :global(tr:nth-child(even)) {
+    background-color: #f9fafb;
+  }
+  
+  /* Two-column layout styles */
+  .prose :global(.two-column) {
+    padding: 1.5rem 0;
+    margin: 1.5rem 0;
+  }
+  
+  .prose :global(.two-column:first-child) {
+    margin-top: 0;
+  }
+  
+  .prose :global(.two-column:last-child) {
+    margin-bottom: 0;
+  }
+  
+  /* Size variants */
+  .prose :global(.two-column--compact) {
+    padding: 1.5rem 0;
+  }
+  
+  .prose :global(.two-column--expanded) {
+    padding: 4rem 0;
+  }
+  
+  .prose :global(.two-column__container) {
+    max-width: 80rem;
+    margin: 0 auto;
+    padding: 0 1rem;
+  }
+  
+  .prose :global(.two-column__grid) {
+    display: grid;
+    gap: 3rem;
+    align-items: center;
+  }
+  
+  @media (min-width: 768px) {
+    .prose :global(.two-column__grid) {
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+    }
+    
+    .prose :global(.two-column__grid--left .two-column__image-wrapper) {
+      order: -1;
+    }
+  }
+  
+  .prose :global(.two-column__content h3) {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0 0 1rem 0;
+    color: #1f2937;
+  }
+  
+  .prose :global(.two-column__content p) {
+    margin-bottom: 1rem;
+  }
+  
+  .prose :global(.two-column__content ul),
+  .prose :global(.two-column__content ol) {
+    margin: 1rem 0;
+    padding-left: 1.5rem;
+  }
+  
+  .prose :global(.two-column__content li) {
+    margin-bottom: 0.5rem;
+  }
+  
+  .prose :global(.two-column__cta) {
+    display: inline-block;
+    margin-top: 1.5rem;
+    padding: 0.75rem 1.5rem;
+    background: var(--color-primary, #3b82f6);
+    color: white;
+    font-weight: 500;
+    text-decoration: none;
+    border-radius: 0.375rem;
+    transition: background 150ms ease;
+  }
+  
+  .prose :global(.two-column__cta:hover) {
+    background: var(--color-primary-dark, #2563eb);
+    color: white;
+  }
+  
+  /* Two-column sections no longer have wrapper backgrounds */
+  
+  .prose :global(.two-column__image-wrapper) {
+    position: relative;
+    overflow: hidden;
+    border-radius: 0.5rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  }
+  
+  .prose :global(.two-column__image) {
+    width: 100%;
+    height: auto;
+    display: block;
+    transition: transform 300ms ease;
+  }
+  
+  .prose :global(.two-column__image-wrapper:hover .two-column__image) {
+    transform: scale(1.05);
+  }
+  
+  /* Mobile: Always show text first */
+  @media (max-width: 767px) {
+    .prose :global(.two-column__image-wrapper) {
+      order: 2;
+    }
+    
+    .prose :global(.two-column__content) {
+      order: 1;
+    }
+  }
+  
+  /* H2 Section Backgrounds */
+  .prose :global(.h2-section) {
+    margin-left: calc(-50vw + 50%);
+    margin-right: calc(-50vw + 50%);
+    padding: 2rem calc(50vw - 50% + 1rem);
+  }
+  
+  @media (min-width: 640px) {
+    .prose :global(.h2-section) {
+      padding: 2.5rem calc(50vw - 50% + 1rem);
+    }
+  }
+  
+  @media (min-width: 768px) {
+    .prose :global(.h2-section) {
+      padding: 3rem calc(50vw - 50% + 1rem);
+    }
+  }
+  
+  /* Alternating backgrounds based on section index and startIndex */
+  .service-content[data-start-index="0"] .prose :global(.h2-section[data-section-index="0"]),
+  .service-content[data-start-index="2"] .prose :global(.h2-section[data-section-index="0"]),
+  .service-content[data-start-index="4"] .prose :global(.h2-section[data-section-index="0"]),
+  .service-content[data-start-index="1"] .prose :global(.h2-section[data-section-index="1"]),
+  .service-content[data-start-index="3"] .prose :global(.h2-section[data-section-index="1"]),
+  .service-content[data-start-index="5"] .prose :global(.h2-section[data-section-index="1"]) {
+    background-color: #ffffff;
+  }
+  
+  .service-content[data-start-index="0"] .prose :global(.h2-section[data-section-index="1"]),
+  .service-content[data-start-index="2"] .prose :global(.h2-section[data-section-index="1"]),
+  .service-content[data-start-index="4"] .prose :global(.h2-section[data-section-index="1"]),
+  .service-content[data-start-index="1"] .prose :global(.h2-section[data-section-index="0"]),
+  .service-content[data-start-index="3"] .prose :global(.h2-section[data-section-index="0"]),
+  .service-content[data-start-index="5"] .prose :global(.h2-section[data-section-index="0"]) {
+    background-color: #f9fafb;
+  }
+  
+  /* Continue alternating for additional sections */
+  .service-content[data-start-index="0"] .prose :global(.h2-section[data-section-index="2"]),
+  .service-content[data-start-index="2"] .prose :global(.h2-section[data-section-index="2"]),
+  .service-content[data-start-index="4"] .prose :global(.h2-section[data-section-index="2"]),
+  .service-content[data-start-index="1"] .prose :global(.h2-section[data-section-index="3"]),
+  .service-content[data-start-index="3"] .prose :global(.h2-section[data-section-index="3"]),
+  .service-content[data-start-index="5"] .prose :global(.h2-section[data-section-index="3"]) {
+    background-color: #ffffff;
+  }
+  
+  .service-content[data-start-index="0"] .prose :global(.h2-section[data-section-index="3"]),
+  .service-content[data-start-index="2"] .prose :global(.h2-section[data-section-index="3"]),
+  .service-content[data-start-index="4"] .prose :global(.h2-section[data-section-index="3"]),
+  .service-content[data-start-index="1"] .prose :global(.h2-section[data-section-index="2"]),
+  .service-content[data-start-index="3"] .prose :global(.h2-section[data-section-index="2"]),
+  .service-content[data-start-index="5"] .prose :global(.h2-section[data-section-index="2"]) {
+    background-color: #f9fafb;
+  }
+  
+  /* Sections 4-5 */
+  .service-content[data-start-index="0"] .prose :global(.h2-section[data-section-index="4"]),
+  .service-content[data-start-index="2"] .prose :global(.h2-section[data-section-index="4"]),
+  .service-content[data-start-index="4"] .prose :global(.h2-section[data-section-index="4"]),
+  .service-content[data-start-index="1"] .prose :global(.h2-section[data-section-index="5"]),
+  .service-content[data-start-index="3"] .prose :global(.h2-section[data-section-index="5"]),
+  .service-content[data-start-index="5"] .prose :global(.h2-section[data-section-index="5"]) {
+    background-color: #ffffff;
+  }
+  
+  .service-content[data-start-index="0"] .prose :global(.h2-section[data-section-index="5"]),
+  .service-content[data-start-index="2"] .prose :global(.h2-section[data-section-index="5"]),
+  .service-content[data-start-index="4"] .prose :global(.h2-section[data-section-index="5"]),
+  .service-content[data-start-index="1"] .prose :global(.h2-section[data-section-index="4"]),
+  .service-content[data-start-index="3"] .prose :global(.h2-section[data-section-index="4"]),
+  .service-content[data-start-index="5"] .prose :global(.h2-section[data-section-index="4"]) {
+    background-color: #f9fafb;
+  }
+  
+  /* Sections 6-7 */
+  .service-content[data-start-index="0"] .prose :global(.h2-section[data-section-index="6"]),
+  .service-content[data-start-index="2"] .prose :global(.h2-section[data-section-index="6"]),
+  .service-content[data-start-index="4"] .prose :global(.h2-section[data-section-index="6"]),
+  .service-content[data-start-index="1"] .prose :global(.h2-section[data-section-index="7"]),
+  .service-content[data-start-index="3"] .prose :global(.h2-section[data-section-index="7"]),
+  .service-content[data-start-index="5"] .prose :global(.h2-section[data-section-index="7"]) {
+    background-color: #ffffff;
+  }
+  
+  .service-content[data-start-index="0"] .prose :global(.h2-section[data-section-index="7"]),
+  .service-content[data-start-index="2"] .prose :global(.h2-section[data-section-index="7"]),
+  .service-content[data-start-index="4"] .prose :global(.h2-section[data-section-index="7"]),
+  .service-content[data-start-index="1"] .prose :global(.h2-section[data-section-index="6"]),
+  .service-content[data-start-index="3"] .prose :global(.h2-section[data-section-index="6"]),
+  .service-content[data-start-index="5"] .prose :global(.h2-section[data-section-index="6"]) {
+    background-color: #f9fafb;
+  }
+  
+  /* Sections 8-9 */
+  .service-content[data-start-index="0"] .prose :global(.h2-section[data-section-index="8"]),
+  .service-content[data-start-index="2"] .prose :global(.h2-section[data-section-index="8"]),
+  .service-content[data-start-index="4"] .prose :global(.h2-section[data-section-index="8"]),
+  .service-content[data-start-index="1"] .prose :global(.h2-section[data-section-index="9"]),
+  .service-content[data-start-index="3"] .prose :global(.h2-section[data-section-index="9"]),
+  .service-content[data-start-index="5"] .prose :global(.h2-section[data-section-index="9"]) {
+    background-color: #ffffff;
+  }
+  
+  .service-content[data-start-index="0"] .prose :global(.h2-section[data-section-index="9"]),
+  .service-content[data-start-index="2"] .prose :global(.h2-section[data-section-index="9"]),
+  .service-content[data-start-index="4"] .prose :global(.h2-section[data-section-index="9"]),
+  .service-content[data-start-index="1"] .prose :global(.h2-section[data-section-index="8"]),
+  .service-content[data-start-index="3"] .prose :global(.h2-section[data-section-index="8"]),
+  .service-content[data-start-index="5"] .prose :global(.h2-section[data-section-index="8"]) {
+    background-color: #f9fafb;
+  }
+  
+  /* Adjust spacing for first and last H2 sections */
+  .prose :global(.h2-section:first-child) {
+    margin-top: 0;
+  }
+  
+  .prose :global(.h2-section:last-child) {
+    margin-bottom: 0;
+  }
+</style>

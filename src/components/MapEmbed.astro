@@ -1,0 +1,65 @@
+---
+import { getCachedMapEmbedConfig, generateEmbedUrl } from '@/lib/google-places';
+import { siteConfig } from '@/config/site';
+
+// Get the cached map configuration (computed only once per build)
+const mapConfig = await getCachedMapEmbedConfig();
+
+// Handle iframe type separately
+let embedUrl = '';
+let isIframe = false;
+
+if (mapConfig.type === 'iframe') {
+  // Check if it's a complete iframe or just a URL
+  if (mapConfig.content.includes('<iframe')) {
+    isIframe = true;
+  } else {
+    embedUrl = mapConfig.content;
+  }
+} else {
+  embedUrl = generateEmbedUrl(mapConfig);
+}
+
+// Check if we have a valid embed
+const hasMap = isIframe || embedUrl;
+---
+
+{hasMap && (
+  <div class="map-embed">
+    {isIframe ? (
+      <div set:html={mapConfig.content} />
+    ) : (
+      <iframe
+        src={embedUrl}
+        width="100%"
+        height="400"
+        style="border:0;"
+        allowfullscreen
+        loading="lazy"
+        referrerpolicy="no-referrer-when-downgrade"
+        title={`Map showing location of ${siteConfig.businessName}`}
+      />
+    )}
+  </div>
+)}
+
+<style>
+  .map-embed {
+    border-radius: 0.5rem;
+    overflow: hidden;
+  }
+  
+  /* Ensure iframe from set:html is responsive */
+  .map-embed :global(iframe) {
+    width: 100%;
+    height: 400px;
+  }
+  
+  /* Mobile adjustments */
+  @media (max-width: 640px) {
+    .map-embed :global(iframe),
+    .map-embed iframe {
+      height: 300px;
+    }
+  }
+</style>

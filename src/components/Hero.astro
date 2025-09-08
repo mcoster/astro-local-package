@@ -1,0 +1,136 @@
+---
+import { Image } from 'astro:assets';
+import { getAltText } from '@/lib/image-alt-generator';
+import { siteConfig } from '@/config/site';
+
+export interface Props {
+  title?: string;
+  subtitle?: string;
+  backgroundImage?: string;
+  ctaText?: string;
+  ctaHref?: string;
+  overlayOpacity?: number;
+}
+
+const {
+  title = `Welcome to ${siteConfig.businessName}`,
+  subtitle = siteConfig.tagline,
+  backgroundImage = '/images/hero-bg.jpg',
+  ctaText = `Call ${siteConfig.phone}`,
+  ctaHref = `tel:${siteConfig.formattedPhone}`,
+  overlayOpacity = 0.6,
+} = Astro.props;
+
+// Import image if it's a local path
+let heroImage;
+if (backgroundImage && backgroundImage.startsWith('/images/')) {
+  try {
+    const images = import.meta.glob<{ default: ImageMetadata }>('/public/images/*');
+    const imagePath = `/public${backgroundImage}`;
+    if (images[imagePath]) {
+      heroImage = (await images[imagePath]()).default;
+    }
+  } catch (e) {
+    // Fallback to string path if import fails
+    heroImage = backgroundImage;
+  }
+} else {
+  heroImage = backgroundImage;
+}
+
+// Generate alt text from image path if not provided
+const backgroundAltText = getAltText(undefined, backgroundImage, 'Hero background');
+---
+
+<section class="hero-section relative overflow-hidden">
+  <!-- Background Image or Fallback -->
+  <div class="absolute inset-0 z-0">
+    {backgroundImage ? (
+      <>
+        {typeof heroImage === 'object' ? (
+          <Image
+            src={heroImage}
+            alt={backgroundAltText}
+            class="h-full w-full object-cover"
+            loading="eager"
+            widths={[640, 768, 1024, 1280, 1536]}
+            sizes="100vw"
+            format="webp"
+            quality={85}
+          />
+        ) : (
+          <img
+            src={backgroundImage}
+            alt={backgroundAltText}
+            class="h-full w-full object-cover"
+            loading="eager"
+            onerror="this.style.display='none'"
+          />
+        )}
+        <!-- Gradient Overlay -->
+        <div 
+          class="absolute inset-0"
+          style="background: linear-gradient(135deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.4) 50%, rgba(0,0,0,0.2) 100%);"
+        ></div>
+      </>
+    ) : null}
+    <!-- Fallback gradient background -->
+    <div 
+      class="absolute inset-0 hero-fallback-bg"
+      style={!backgroundImage ? "opacity: 1;" : "opacity: 0;"}
+    ></div>
+  </div>
+  
+  <!-- Content -->
+  <div class="relative z-10 px-4 py-20 sm:py-24 lg:py-32">
+    <div class="max-w-7xl mx-auto">
+      <div class="max-w-3xl">
+        <h1 class="hero-title text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6">
+          {title}
+        </h1>
+        <p class="hero-subtitle text-xl md:text-2xl text-gray-100 mb-8">
+          {subtitle}
+        </p>
+        {ctaText && (
+          <a
+            href={ctaHref}
+            class="inline-flex items-center justify-center btn-cta-primary"
+          >
+            {ctaText}
+          </a>
+        )}
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero-section {
+    min-height: 500px;
+  }
+  
+  @media (min-width: 768px) {
+    .hero-section {
+      min-height: 600px;
+    }
+  }
+  
+  /* Fallback gradient when no image is provided */
+  .hero-fallback-bg {
+    background: linear-gradient(135deg, 
+      var(--color-primary, #4f46e5) 0%, 
+      var(--color-secondary, #7c3aed) 100%);
+    transition: opacity 0.3s ease;
+  }
+  
+  /* Subtle text shadows for improved readability */
+  .hero-title {
+    text-shadow: 
+      0 2px 4px rgba(0,0,0,0.3),
+      0 4px 8px rgba(0,0,0,0.15);
+  }
+  
+  .hero-subtitle {
+    text-shadow: 0 1px 3px rgba(0,0,0,0.25);
+  }
+</style>
