@@ -21,7 +21,7 @@ export const SHORTCODE_REGISTRY: ShortcodeDefinition[] = [
     name: 'businessName',
     description: 'The name of the business',
     contexts: ['general', 'service', 'location', 'legal'],
-    example: 'Adelaide Roof Cleaning Pros'
+    example: 'Your Business Name'
   },
   {
     name: 'phone',
@@ -33,7 +33,7 @@ export const SHORTCODE_REGISTRY: ShortcodeDefinition[] = [
     name: 'email',
     description: 'Business email address',
     contexts: ['general', 'service', 'location', 'legal'],
-    example: 'info@adelaideroofcleaning.com.au'
+    example: 'info@yourbusiness.com'
   },
   {
     name: 'formattedPhone',
@@ -53,7 +53,7 @@ export const SHORTCODE_REGISTRY: ShortcodeDefinition[] = [
     name: 'city',
     description: 'City where the business is located',
     contexts: ['general', 'legal'],
-    example: 'Kilburn'
+    example: 'Your Suburb'
   },
   {
     name: 'state',
@@ -71,7 +71,7 @@ export const SHORTCODE_REGISTRY: ShortcodeDefinition[] = [
     name: 'mainLocation',
     description: 'Combined city, state, and postcode',
     contexts: ['general', 'service'],
-    example: 'Kilburn, SA 5084',
+    example: 'Your Suburb, STATE 0000',
     computed: true
   },
   
@@ -86,7 +86,7 @@ export const SHORTCODE_REGISTRY: ShortcodeDefinition[] = [
     name: 'governingCity',
     description: 'City for legal jurisdiction (defaults to business city)',
     contexts: ['legal'],
-    example: 'Adelaide'
+    example: 'Your City'
   },
   
   // Service Page Specific
@@ -100,25 +100,25 @@ export const SHORTCODE_REGISTRY: ShortcodeDefinition[] = [
     name: 'serviceDescription',
     description: 'Description of the current service',
     contexts: ['service'],
-    example: 'Professional tile roof cleaning services'
+    example: 'Professional services description'
   },
   {
     name: 'serviceSlug',
     description: 'URL slug for the current service',
     contexts: ['service'],
-    example: 'tile-roof-cleaning'
+    example: 'service-slug'
   },
   {
     name: 'serviceImage',
     description: 'Featured image for the current service',
     contexts: ['service'],
-    example: '/images/tile-roof-cleaning.jpg'
+    example: '/images/service-image.jpg'
   },
   {
     name: 'serviceExcerpt',
     description: 'Short excerpt for the current service',
     contexts: ['service'],
-    example: 'Expert tile roof cleaning to restore your roof\'s appearance'
+    example: 'Service excerpt text'
   },
   
   // Location Page Specific
@@ -126,7 +126,7 @@ export const SHORTCODE_REGISTRY: ShortcodeDefinition[] = [
     name: 'suburb',
     description: 'Current suburb name',
     contexts: ['location'],
-    example: 'North Adelaide'
+    example: 'Nearby Suburb'
   },
   {
     name: 'postcodeSpace',

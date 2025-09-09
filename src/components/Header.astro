@@ -21,10 +21,10 @@ const services = await getCollection('services');
 const sortedServices = services.sort((a, b) => (a.data.order || 999) - (b.data.order || 999));
 
 const navItems = [
-  { label: 'Home', href: '/', title: 'Go to Adelaide Roof Cleaning Pros homepage' },
-  { label: 'About', href: '/about', title: 'Learn about Adelaide Roof Cleaning Pros' },
-  { label: 'Services', href: '/services', hasDropdown: true, title: 'View our roof cleaning services' },
-  { label: 'Contact', href: '/contact', title: 'Contact us for a free roof cleaning quote' },
+  { label: 'Home', href: '/', title: `Go to ${siteConfig.businessName} homepage` },
+  { label: 'About', href: '/about', title: `Learn about ${siteConfig.businessName}` },
+  { label: 'Services', href: '/services', hasDropdown: true, title: 'View our services' },
+  { label: 'Contact', href: '/contact', title: 'Contact us for a free quote' },
 ];
 
 const currentPath = Astro.url.pathname;
@@ -34,7 +34,7 @@ const currentPath = Astro.url.pathname;
   <div class="max-w-7xl mx-auto px-4">
     <div class="header-content flex items-center justify-between transition-all duration-300">
       <!-- Logo/Business Name -->
-      <a href="/" class="flex items-center space-x-2" title="Adelaide Roof Cleaning Pros - Home">
+      <a href="/" class="flex items-center space-x-2" title={`${siteConfig.businessName} - Home`}>
         {siteConfig.businessLogo ? (
           <img 
             src={siteConfig.businessLogo} 
@@ -75,7 +75,7 @@ const currentPath = Astro.url.pathname;
                     {sortedServices.map((service) => (
                       <a
                         href={`/services/${service.slug}`}
-                        title={`${service.data.title} services in Adelaide`}
+                        title={`${service.data.title} services in ${siteConfig.mainLocation}`}
                         class="service-link block whitespace-nowrap transition-colors text-gray-700"
                         class:list={[
                           currentPath === `/services/${service.slug}` ? 'text-primary font-medium bg-gray-50' : ''
@@ -105,7 +105,7 @@ const currentPath = Astro.url.pathname;
         
           <a
             href={`tel:${siteConfig.formattedPhone}`}
-            title="Call Adelaide Roof Cleaning Pros for a free quote"
+            title={`Call ${siteConfig.businessName}`}
             class="hidden md:inline-flex items-center justify-center btn-cta-compact"
           >
             Call {siteConfig.phone}

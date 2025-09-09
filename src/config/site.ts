@@ -142,14 +142,14 @@ export const siteConfig = {
   ownerName: getConfigValue('business.owner_name', 'PUBLIC_OWNER_NAME', undefined),
   broadRegion: getConfigValue('business.broad_region', 'PUBLIC_BROAD_REGION', undefined),
   formLocation: getConfigValue('business.form_location', 'PUBLIC_FORM_LOCATION', undefined),
-  mainLocation: getConfigValue('service.main_location', 'PUBLIC_MAIN_LOCATION', 'Adelaide'),
+  mainLocation: getConfigValue('service.main_location', 'PUBLIC_MAIN_LOCATION', 'Your City'),
   mainServiceCategory: getConfigValue('service.main_category', 'PUBLIC_MAIN_SERVICE_CATEGORY', 'Professional'),
   
   // Address
   address: {
     street: getConfigValue('address.street', 'PUBLIC_STREET_ADDRESS', '123 Main Street'),
-    city: getConfigValue('address.city', 'PUBLIC_CITY', 'Adelaide'),
-    state: getConfigValue('address.state', 'PUBLIC_STATE', 'SA'),
+    city: getConfigValue('address.city', 'PUBLIC_CITY', 'Your City'),
+    state: getConfigValue('address.state', 'PUBLIC_STATE', 'State'),
     postcode: getConfigValue('address.postcode', 'PUBLIC_POSTCODE', '5000'),
     country: getConfigValue('address.country', 'PUBLIC_COUNTRY', 'Australia'),
   } as Address,
@@ -174,7 +174,7 @@ export const siteConfig = {
   } as SocialLinks,
   
   // SEO & Metadata
-  siteUrl: getConfigValue('website.url', 'PUBLIC_SITE_URL', 'https://adelaide-roof-cleaning-pros.netlify.app'),
+  siteUrl: getConfigValue('website.url', 'PUBLIC_SITE_URL', 'https://your-website.com'),
   googleMapsUrl: getConfigValue('website.google_maps_url', 'PUBLIC_GOOGLE_MAPS_URL', undefined),
   googleReviewsUrl: getConfigValue('website.google_reviews_url', 'PUBLIC_GOOGLE_REVIEWS_URL', undefined),
   

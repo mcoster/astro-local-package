@@ -66,15 +66,15 @@ const localBusinessSchema = {
   },
   "openingHoursSpecification": openingHoursSpecification,
   "areaServed": [
-    // GeoCircle for primary service area (33km radius from Kilburn, Adelaide)
+    // GeoCircle for primary service area
     {
       "@type": "GeoCircle",
       "geoMidpoint": {
         "@type": "GeoCoordinates",
-        "latitude": -34.8517, // Kilburn, Adelaide coordinates
-        "longitude": 138.5829
+        "latitude": siteConfig.locationPages.centerLat || -34.9285, // Use config or default to Australia center
+        "longitude": siteConfig.locationPages.centerLng || 138.6007
       },
-      "geoRadius": "33000" // 33km in meters (service radius)
+      "geoRadius": (siteConfig.locationPages.serviceRadiusKm * 1000).toString() // Convert km to meters
     },
     // Individual cities/suburbs
     {

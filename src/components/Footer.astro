@@ -18,9 +18,9 @@ const footerLocations = allFooterLocations.filter(
 );
 
 const quickLinks = [
-  { label: 'Home', href: '/', title: 'Go to Adelaide Roof Cleaning Pros homepage' },
-  { label: 'About', href: '/about', title: 'Learn about Adelaide Roof Cleaning Pros' },
-  { label: 'Contact', href: '/contact', title: 'Contact us for a free roof cleaning quote' },
+  { label: 'Home', href: '/', title: `Go to ${siteConfig.businessName} homepage` },
+  { label: 'About', href: '/about', title: `Learn about ${siteConfig.businessName}` },
+  { label: 'Contact', href: '/contact', title: 'Contact us' },
 ];
 
 const legalLinks = [
@@ -39,7 +39,7 @@ const legalLinks = [
         <div class="space-y-2 text-sm">
           <p>{siteConfig.fullAddress}</p>
           <p>
-            <a href={`tel:${siteConfig.formattedPhone}`} title="Call Adelaide Roof Cleaning Pros" class="hover:text-white transition-colors">
+            <a href={`tel:${siteConfig.formattedPhone}`} title={`Call ${siteConfig.businessName}`} class="hover:text-white transition-colors">
               {siteConfig.phone}
             </a>
           </p>
@@ -130,7 +130,7 @@ const legalLinks = [
         <ul class="space-y-2">
           {sortedServices.map((service) => (
             <li>
-              <a href={`/services/${service.slug}`} title={`${service.data.title} services in Adelaide`} class="text-sm hover:text-white transition-colors">
+              <a href={`/services/${service.slug}`} title={`${service.data.title} services in ${siteConfig.mainLocation}`} class="text-sm hover:text-white transition-colors">
                 {service.data.title}
               </a>
             </li>
@@ -144,7 +144,7 @@ const legalLinks = [
         <ul class="space-y-1">
           <!-- Main location linking to homepage -->
           <li>
-            <a href="/" title="Roof cleaning services in Adelaide" class="text-sm hover:text-white transition-colors font-semibold">
+            <a href="/" title={`Services in ${siteConfig.mainLocation}`} class="text-sm hover:text-white transition-colors font-semibold">
               {siteConfig.mainLocation}
             </a>
           </li>
