@@ -184,28 +184,63 @@ npm run images:fetch-stock # Download stock photos
 
 Place client images in `business-images/pending/` and run the processing pipeline.
 
-## Updating the Template
+## Package Installation & Updates
 
-### Automatic Updates
+### Installation Method: Git References (Recommended)
 
-Client sites can automatically check for template updates:
+Client sites use Git references to automatically stay up-to-date with the package:
 
-1. The GitHub Action runs daily
-2. Creates a PR when updates are available
-3. Run tests to ensure compatibility
-4. Auto-merge if all checks pass
+```json
+{
+  "dependencies": {
+    "@mcoster/astro-local-package": "github:mcoster/astro-local-package#main"
+  }
+}
+```
 
-### Manual Updates
+#### Why Git References?
 
-```bash
-# Check for updates
-npm outdated @mcoster/astro-local-package
+We use Git references instead of versioned packages for several key reasons:
 
-# Update to latest version
-npm update @mcoster/astro-local-package
+1. **Zero Authentication Issues**: GitHub Package Registry requires authentication even for public packages. Git references work seamlessly with the default `GITHUB_TOKEN` in GitHub Actions.
 
-# Update to specific version
-npm install @mcoster/astro-local-package@1.2.3
+2. **Truly Hands-Off Updates**: Sites automatically get the latest updates when they rebuild on platforms like Netlify, without any manual intervention.
+
+3. **No Token Management**: No need to create, store, or rotate Personal Access Tokens (PATs) for each new site.
+
+4. **Programmatic Simplicity**: New sites can be created programmatically without configuring authentication secrets.
+
+#### The Tradeoff
+
+The main tradeoff is less granular version control. However, this is mitigated through:
+- Careful branch management in the package repository
+- Feature branches for development
+- Optional use of stable branches for production sites
+
+### Alternative Installation Methods
+
+#### For Production Sites Requiring Version Pinning
+
+Use a specific Git tag:
+
+```json
+{
+  "dependencies": {
+    "@mcoster/astro-local-package": "github:mcoster/astro-local-package#v1.0.13"
+  }
+}
+```
+
+#### For Development/Testing
+
+Use a feature branch:
+
+```json
+{
+  "dependencies": {
+    "@mcoster/astro-local-package": "github:mcoster/astro-local-package#feature/new-component"
+  }
+}
 ```
 
 ## Customization
