@@ -2,6 +2,61 @@
 
 This document outlines the development workflow for the Astro Local Package, particularly focusing on safe feature development using branches.
 
+## Suburb Data Management
+
+### Automatic Validation and Regeneration
+
+Sites using this package now have automatic suburb data validation that streamlines location-based features:
+
+1. **Pre-build validation**: The build process automatically validates suburbs.json against current configuration
+2. **Auto-regeneration**: If config changes are detected and database is available, data regenerates automatically
+3. **Fallback support**: If suburbs.json is missing and no database, a minimal fallback dataset allows builds to continue
+4. **CI/CD Compatible**: Works seamlessly in Netlify/Vercel environments where database isn't available
+
+### Available Commands
+
+Sites using this package have these suburb management commands:
+
+```bash
+# Validate suburbs data (runs automatically on build)
+npm run suburbs:validate
+
+# Force regenerate suburbs data from database
+npm run suburbs:generate
+
+# Remove suburbs.json to test validation/regeneration
+npm run suburbs:clean
+```
+
+### How It Works
+
+1. **Validation**: Compares suburbs.json metadata (center coordinates, radius, state) with current business.yaml config
+2. **Regeneration**: If mismatch detected and PostGIS database available, regenerates automatically
+3. **Graceful Degradation**: If no database available:
+   - Uses existing suburbs.json with warning if metadata doesn't match
+   - Falls back to minimal hardcoded suburbs if no JSON file exists
+4. **Build Continuity**: Never breaks builds - always provides some suburb data
+
+### Site Copying Workflow
+
+When copying a site as a template for a new location:
+
+1. Update `config/business.yaml` with new location details:
+   - Address coordinates
+   - Service radius
+   - State
+2. Run `npm run build` - suburbs data will auto-regenerate if database available
+3. Or run `npm run suburbs:generate` to force regeneration
+4. The validation script will detect the config change and handle it appropriately
+
+### Implementation Requirements
+
+Sites need these files (typically copied from template):
+- `scripts/validate-suburbs.ts` - Validation and auto-regeneration logic
+- `scripts/export-suburbs.ts` - Database export with metadata
+- Updated `package.json` with prebuild hook and suburb commands
+- Updated `src/lib/static-suburbs.ts` with fallback support
+
 ## Branch Strategy
 
 Since client sites pull directly from Git references, we use a careful branch strategy to ensure stability:
