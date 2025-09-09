@@ -87,11 +87,18 @@ if (source === 'inline' && content) {
   }
   
   .prose h2 {
-    font-size: 1.5rem;
+    font-size: 1.875rem; /* 30px - text-3xl */
     font-weight: 700;
     line-height: 1.3333333;
     margin-bottom: 1em;
     margin-top: 2em;
+    color: #111827; /* text-gray-900 */
+  }
+  
+  @media (min-width: 768px) {
+    .prose h2 {
+      font-size: 2.25rem; /* 36px - md:text-4xl */
+    }
   }
   
   .prose h3 {
