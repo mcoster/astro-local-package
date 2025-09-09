@@ -32,6 +32,9 @@ git checkout -b feature/new-component
 
 # Make your changes
 # Test locally with a client site
+
+# Before committing, bump the version
+npm version patch  # or minor/major as appropriate
 ```
 
 ### 2. Testing with Client Sites
@@ -62,6 +65,7 @@ Before merging a feature branch to main:
 - [ ] Tested with multiple client sites
 - [ ] No breaking changes (or migration documented)
 - [ ] Documentation updated if needed
+- [ ] Version number bumped in package.json
 - [ ] Consider impact on ALL production sites
 
 ### 4. Merging to Main
@@ -133,17 +137,38 @@ Since sites auto-update, avoid breaking changes when possible:
 
 ## Version Management
 
-Even though we use Git references, we still maintain version numbers for:
-- Release tracking
+Even though we use Git references, we MUST still maintain version numbers for:
+- Release tracking and history
 - Changelog generation
 - Emergency rollback points
+- Professional package structure
+- Potential future needs for versioned releases
 
-### Version Bumping
+### Version Bumping Requirements
 
-The publish workflow automatically bumps versions:
-- `fix:` commits → patch version
-- `feat:` commits → minor version (manually)
-- Breaking changes → major version (manually)
+**IMPORTANT: Always bump the version number in package.json when making changes to the package.**
+
+Manual version bumping should follow semantic versioning:
+- **Patch version (1.0.x)**: Bug fixes, minor tweaks, documentation updates
+  ```bash
+  npm version patch
+  ```
+- **Minor version (1.x.0)**: New features, new components, non-breaking enhancements
+  ```bash
+  npm version minor
+  ```
+- **Major version (x.0.0)**: Breaking changes (use sparingly with Git references)
+  ```bash
+  npm version major
+  ```
+
+Example workflow:
+```bash
+# After making changes
+npm version patch  # or minor/major as appropriate
+git add package.json package-lock.json
+git commit -m "chore: bump version to 1.0.14"
+```
 
 ### Tagging Releases
 
