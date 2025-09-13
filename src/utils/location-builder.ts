@@ -118,12 +118,12 @@ export async function buildLocationPages(): Promise<LocationPageData[]> {
   try {
     // Get center location
     const center = await getCenterLocation();
-    
-    // Get service radius from env
-    const radiusKm = parseInt(import.meta.env.SERVICE_RADIUS_KM || '50');
-    
-    // Get max locations limit from env (default to 100 to prevent memory issues)
-    const maxLocations = parseInt(import.meta.env.MAX_LOCATION_PAGES || '100');
+
+    // Get service radius from siteConfig (single source of truth: business.yaml)
+    const radiusKm = siteConfig.locationPages.serviceRadiusKm;
+
+    // Get max locations limit from siteConfig (single source of truth: business.yaml)
+    const maxLocations = siteConfig.locationPages.maxLocationPages;
     
     console.log(`Building location pages for suburbs within ${radiusKm}km of ${center.lat}, ${center.lng}`);
     
