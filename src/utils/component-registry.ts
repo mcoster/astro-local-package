@@ -4,26 +4,26 @@
  */
 
 // Import all components that can be used in dynamic pages
-import HeroWithForm from '@/components/HeroWithForm.astro';
-import Hero from '@/components/Hero.astro';
-import ServicesGrid from '@/components/ServicesGrid.astro';
-import TwoColumnSection from '@/components/TwoColumnSection.astro';
-import IconGrid from '@/components/IconGrid.astro';
-import CTABanner from '@/components/CTABanner.astro';
-import ServiceAreas from '@/components/ServiceAreas.astro';
-import ServiceAreasWithLocations from '@/components/ServiceAreasWithLocations.astro';
-import ContactForm from '@/components/ContactForm.astro';
-import ContactInfo from '@/components/ContactInfo.astro';
-import QuoteForm from '@/components/QuoteForm.astro';
-import BusinessHours from '@/components/BusinessHours.astro';
-import ServiceContent from '@/components/ServiceContent.astro';
-import RelatedServices from '@/components/RelatedServices.astro';
-import ServiceFeatures from '@/components/ServiceFeatures.astro';
-import ServiceFAQ from '@/components/ServiceFAQ.astro';
-import Breadcrumb from '@/components/Breadcrumb.astro';
-import MarkdownContent from '@/components/MarkdownContent.astro';
-import WhyUs from '@/components/WhyUs.astro';
-import Spacer from '@/components/Spacer.astro';
+import HeroWithForm from '../components/HeroWithForm.astro';
+import Hero from '../components/Hero.astro';
+import ServicesGrid from '../components/ServicesGrid.astro';
+import TwoColumnSection from '../components/TwoColumnSection.astro';
+import IconGrid from '../components/IconGrid.astro';
+import CTABanner from '../components/CTABanner.astro';
+import ServiceAreas from '../components/ServiceAreas.astro';
+import ServiceAreasWithLocations from '../components/ServiceAreasWithLocations.astro';
+import ContactForm from '../components/ContactForm.astro';
+import ContactInfo from '../components/ContactInfo.astro';
+import QuoteForm from '../components/QuoteForm.astro';
+import BusinessHours from '../components/BusinessHours.astro';
+import ServiceContent from '../components/ServiceContent.astro';
+import RelatedServices from '../components/RelatedServices.astro';
+import ServiceFeatures from '../components/ServiceFeatures.astro';
+import ServiceFAQ from '../components/ServiceFAQ.astro';
+import Breadcrumb from '../components/Breadcrumb.astro';
+import MarkdownContent from '../components/MarkdownContent.astro';
+import WhyUs from '../components/WhyUs.astro';
+import Spacer from '../components/Spacer.astro';
 
 /**
  * Registry of all available components

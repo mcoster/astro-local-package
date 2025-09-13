@@ -217,18 +217,18 @@ export class LocationTemplateProcessor extends TemplateProcessor {
         .replace(/{{state}}/g, this.suburb.state);
       
       // Calculate distance if available
-      if (this.suburb.distance_km) {
-        const distance = `${Math.round(this.suburb.distance_km)} km`;
+      if (this.suburb.distanceKm) {
+        const distance = `${Math.round(this.suburb.distanceKm)} km`;
         processed = processed.replace(/{{distance}}/g, distance);
       }
       
       // Calculate direction if coordinates available
-      if (this.suburb.lat && this.suburb.lng && this.centralLat && this.centralLng) {
+      if (this.suburb.latitude && this.suburb.longitude && this.centralLat && this.centralLng) {
         const direction = this.getCompassDirection(
           this.centralLat,
           this.centralLng,
-          this.suburb.lat,
-          this.suburb.lng
+          this.suburb.latitude,
+          this.suburb.longitude
         );
         processed = processed.replace(/{{direction}}/g, direction);
       }

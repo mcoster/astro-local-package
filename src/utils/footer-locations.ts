@@ -179,7 +179,7 @@ export async function getFooterLocations(): Promise<FooterLocationData[]> {
       console.log(`Using manual footer suburbs: ${manualSuburbs.join(', ')}`);
       
       // Query suburbs by name
-      const suburbs = await getSuburbsByName(manualSuburbs);
+      const suburbs = await getSuburbsByName(manualSuburbs as string[]);
       
       // Add distance and direction for manual suburbs
       const suburbsWithDistance = suburbs.map(suburb => 

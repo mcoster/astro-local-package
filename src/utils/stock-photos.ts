@@ -28,6 +28,7 @@ export interface StockPhotoSearchResult {
   photos: StockPhoto[];
   totalResults: number;
   provider: string;
+  cachedAt?: number;
 }
 
 export class StockPhotoService {
@@ -140,7 +141,7 @@ export class StockPhotoService {
           // Cache the result
           this.cache[cacheKey] = {
             ...result,
-            cachedAt: new Date().toISOString()
+            cachedAt: Date.now()
           };
           await this.saveCache();
           

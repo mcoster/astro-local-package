@@ -117,6 +117,21 @@ export async function getSuburbDetails(suburbId: number): Promise<Suburb | null>
 }
 
 /**
+ * Get suburbs by name (case-insensitive partial match)
+ */
+export async function getSuburbsByName(names: string[] | string): Promise<Suburb[]> {
+  const suburbs = loadSuburbs();
+  const nameArray = Array.isArray(names) ? names : [names];
+
+  return suburbs.filter(suburb => {
+    const suburbNameLower = suburb.name.toLowerCase();
+    return nameArray.some(name =>
+      suburbNameLower.includes(name.toLowerCase())
+    );
+  });
+}
+
+/**
  * Get nearby suburbs to a given location
  */
 export async function getNearbySuburbs(

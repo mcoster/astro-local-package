@@ -87,7 +87,7 @@ export default function remarkShortcodes(options: ShortcodeValues = {}): Plugin<
       `${options.city || DEFAULT_VALUES.city}, ${options.state || DEFAULT_VALUES.state} ${options.postcode || DEFAULT_VALUES.postcode}`,
   };
   
-  return function transformer(tree: Root): Root {
+  return function transformer(tree: Root) {
     // Process all text nodes in the markdown tree
     visit(tree, 'text', (node: Text) => {
       if (node.value && node.value.includes('{{')) {

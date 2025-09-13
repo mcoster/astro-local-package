@@ -4,7 +4,7 @@
  */
 
 import { getFallbackImage } from '../config/image-fallback-mappings';
-import type { Root, Paragraph, Heading, List, BlockContent } from 'mdast';
+import type { Root, Paragraph, Heading, List, RootContent } from 'mdast';
 import type { Plugin } from 'unified';
 
 interface TwoColumnAttributes {
@@ -55,7 +55,7 @@ function escapeHtml(text: string): string {
 /**
  * Convert AST node to HTML string
  */
-function nodeToHtml(node: BlockContent): string {
+function nodeToHtml(node: RootContent): string {
   switch (node.type) {
     case 'heading':
       const level = node.depth;
@@ -138,9 +138,9 @@ function parseAttributes(attrString: string): TwoColumnAttributes {
  * Remark plugin to process two-column layout shortcodes
  */
 export function remarkTwoColumn(): Plugin<[], Root> {
-  return function transformer(tree: Root): Root {
+  return function transformer(tree: Root) {
     // Remove console logs and test with a simple change
-    const newChildren: BlockContent[] = [];
+    const newChildren: RootContent[] = [];
     let i = 0;
     
     while (i < tree.children.length) {

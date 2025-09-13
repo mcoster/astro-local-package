@@ -4,7 +4,7 @@
  * with caching and expiry management
  */
 
-import { siteConfig } from '@/config/site';
+import { siteConfig } from '../config/site';
 
 const CACHE_DURATION_DAYS = 30;
 const CACHE_DURATION_MS = CACHE_DURATION_DAYS * 24 * 60 * 60 * 1000;

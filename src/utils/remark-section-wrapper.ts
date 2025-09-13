@@ -12,7 +12,7 @@ import type { Plugin } from 'unified';
  * @returns Remark transformer plugin
  */
 export function remarkSectionWrapper(): Plugin<[], Root> {
-  return function transformer(tree: Root): Root {
+  return function transformer(tree: Root) {
     const h2Indices: number[] = [];
     
     // Find all H2 positions

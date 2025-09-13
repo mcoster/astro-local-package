@@ -11,6 +11,8 @@ export interface LocationData {
   nearbySuburbs?: Suburb[];
   businessName: string;
   serviceRadius: number;
+  centralLat?: number;
+  centralLng?: number;
 }
 
 export class LocationSpintax {
