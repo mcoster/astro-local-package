@@ -249,20 +249,32 @@ export function groupLocationsByDistance(locations: LocationPageData[]): Record<
  */
 export function groupLocationsAlphabetically(locations: LocationPageData[]): Record<string, LocationPageData[]> {
   const groups: Record<string, LocationPageData[]> = {};
-  
+
   locations.forEach(location => {
-    const firstLetter = location.suburb.name[0].toUpperCase();
-    if (!groups[firstLetter]) {
-      groups[firstLetter] = [];
+    const name = location.suburb.name;
+
+    // Skip invalid entries (defensive check in case they exist in data)
+    if (!name || name.length === 0) {
+      return;
     }
-    groups[firstLetter].push(location);
+
+    // Get first character for grouping
+    const firstChar = name[0].toUpperCase();
+
+    // Group numeric or special characters under '#'
+    const groupKey = /^[A-Z]/.test(firstChar) ? firstChar : '#';
+
+    if (!groups[groupKey]) {
+      groups[groupKey] = [];
+    }
+    groups[groupKey].push(location);
   });
-  
+
   // Sort each group by name
   Object.keys(groups).forEach(key => {
     groups[key].sort((a, b) => a.suburb.name.localeCompare(b.suburb.name));
   });
-  
+
   return groups;
 }
 
