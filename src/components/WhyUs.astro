@@ -2,7 +2,7 @@
 /**
  * Why Choose Us Component
  * Displays reasons to choose the business in a grid layout with checkmarks
- * 
+ *
  * Can load data from:
  * 1. Inline props (reasons provided directly)
  * 2. Service-specific YAML files when serviceSlug is provided
@@ -12,6 +12,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import yaml from 'js-yaml';
 import Section from './Section.astro';
+import { TemplateProcessor } from '../utils/template-processor';
+import { siteConfig } from '../config/site';
 
 export interface Props {
   heading?: string;
@@ -20,6 +22,7 @@ export interface Props {
     description: string;
   }>;
   serviceSlug?: string;  // For loading service-specific data
+  templateData?: Record<string, any>;  // Optional custom template data
   variant?: 'white' | 'gray' | 'primary' | 'gradient' | 'transparent';
   className?: string;
 }
@@ -28,9 +31,21 @@ const {
   heading: inlineHeading,
   reasons: inlineReasons,
   serviceSlug,
+  templateData,
   variant = 'white',
   className = '',
 } = Astro.props;
+
+// Create template processor with site config data
+const processor = new TemplateProcessor({
+  businessName: siteConfig.businessName,
+  mainLocation: siteConfig.mainLocation,
+  phone: siteConfig.phone,
+  formattedPhone: siteConfig.formattedPhone,
+  email: siteConfig.email,
+  serviceRadius: String(siteConfig.locationPages.serviceRadiusKm),
+  ...templateData // Allow override from props
+});
 
 // Load service-specific data if serviceSlug is provided and no inline data
 let heading = inlineHeading || 'Why Choose Us';
@@ -50,6 +65,15 @@ if (serviceSlug && !inlineReasons) {
     // Silently fall back to empty reasons array
     console.debug(`No why-choose.yaml found for service: ${serviceSlug}`);
   }
+}
+
+// Process template variables in heading and reasons
+if (heading) {
+  heading = processor.processString(heading);
+}
+
+if (reasons && reasons.length > 0) {
+  reasons = processor.process(reasons) as Array<{title: string, description: string}>;
 }
 ---
 

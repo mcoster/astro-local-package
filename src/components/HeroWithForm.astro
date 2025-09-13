@@ -6,9 +6,11 @@ export interface Props {
   overlayOpacity?: number;
   formTitle?: string;
   formDescription?: string;
+  templateData?: Record<string, any>;  // Optional custom template data
 }
 
 import { siteConfig } from '../config/site';
+import { TemplateProcessor } from '../utils/template-processor';
 import QuoteForm from './QuoteForm.astro';
 
 const {
@@ -18,7 +20,23 @@ const {
   overlayOpacity = 0.7,
   formTitle = 'Get Started Today!',
   formDescription = '',
+  templateData,
 } = Astro.props;
+
+// Create template processor with site config data
+const processor = new TemplateProcessor({
+  businessName: siteConfig.businessName,
+  mainLocation: siteConfig.mainLocation,
+  phone: siteConfig.phone,
+  formattedPhone: siteConfig.formattedPhone,
+  email: siteConfig.email,
+  serviceRadius: String(siteConfig.locationPages.serviceRadiusKm),
+  ...templateData // Allow override from props
+});
+
+// Process template variables in title and subtitle
+const processedTitle = processor.processString(title);
+const processedSubtitle = processor.processString(subtitle);
 ---
 
 <section class="hero-with-form relative overflow-hidden">
@@ -45,10 +63,10 @@ const {
         <!-- Hero Content (60% on desktop) -->
         <div class="lg:col-span-3 text-center lg:text-left">
           <h1 class="hero-title text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6">
-            {title}
+            {processedTitle}
           </h1>
           <p class="hero-subtitle text-xl md:text-2xl text-gray-100 mb-8">
-            {subtitle}
+            {processedSubtitle}
           </p>
           
           <!-- Mobile CTA - hidden on desktop -->
