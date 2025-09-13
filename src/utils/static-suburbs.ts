@@ -35,6 +35,10 @@ function loadSuburbs(): Suburb[] {
         longitude: s.longitude,
         distanceKm: s.distanceKm,
         direction: s.direction,
+        population: s.population || undefined,
+        populationDensity: s.populationDensity || undefined,
+        households: s.households || undefined,
+        medianAge: s.medianAge || undefined,
       }));
       
       console.log(`Loaded ${cachedSuburbs.length} suburbs from project's suburbs.json`);
@@ -179,15 +183,9 @@ export async function getSuburbsWithPopulation(
 ): Promise<SuburbWithPopulation[]> {
   const suburbs = await getSuburbsWithinRadius(centerLat, centerLng, radiusKm);
   
-  // Map to include population fields (even if null)
-  // The project's suburbs.json may include population data
-  return suburbs.map(suburb => ({
-    ...suburb,
-    population: undefined,
-    populationDensity: undefined,
-    households: undefined,
-    medianAge: undefined,
-  }));
+  // Return suburbs with their population data intact
+  // Cast to SuburbWithPopulation since we now include population fields
+  return suburbs as SuburbWithPopulation[];
 }
 
 /**
