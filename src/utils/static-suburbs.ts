@@ -8,12 +8,12 @@ import { join } from 'node:path';
 import type { Suburb, SuburbWithPopulation } from './locations';
 
 // Cache the loaded data
-let cachedSuburbs: Suburb[] | null = null;
+let cachedSuburbs: SuburbWithPopulation[] | null = null;
 
 /**
  * Load suburbs from the project's static JSON file
  */
-function loadSuburbs(): Suburb[] {
+function loadSuburbs(): SuburbWithPopulation[] {
   if (cachedSuburbs) {
     return cachedSuburbs;
   }
@@ -93,7 +93,7 @@ export async function getSuburbsWithinRadius(
   centerLat: number,
   centerLng: number,
   radiusKm: number
-): Promise<Suburb[]> {
+): Promise<SuburbWithPopulation[]> {
   const suburbs = loadSuburbs();
   
   // Filter suburbs within radius and recalculate distance/direction from the given center
@@ -115,7 +115,7 @@ export async function getSuburbsWithinRadius(
 /**
  * Get details for a specific suburb
  */
-export async function getSuburbDetails(suburbId: number): Promise<Suburb | null> {
+export async function getSuburbDetails(suburbId: number): Promise<SuburbWithPopulation | null> {
   const suburbs = loadSuburbs();
   return suburbs.find(s => s.id === suburbId) || null;
 }
@@ -123,7 +123,7 @@ export async function getSuburbDetails(suburbId: number): Promise<Suburb | null>
 /**
  * Get suburbs by name (case-insensitive partial match)
  */
-export async function getSuburbsByName(names: string[] | string): Promise<Suburb[]> {
+export async function getSuburbsByName(names: string[] | string): Promise<SuburbWithPopulation[]> {
   const suburbs = loadSuburbs();
   const nameArray = Array.isArray(names) ? names : [names];
 
@@ -143,7 +143,7 @@ export async function getNearbySuburbs(
   lng: number,
   limit: number = 10,
   excludeId?: number
-): Promise<Suburb[]> {
+): Promise<SuburbWithPopulation[]> {
   const suburbs = loadSuburbs();
   
   // Calculate distances and sort
