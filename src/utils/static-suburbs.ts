@@ -121,18 +121,64 @@ export async function getSuburbDetails(suburbId: number): Promise<SuburbWithPopu
 }
 
 /**
- * Get suburbs by name (case-insensitive partial match)
+ * Get suburbs by name with improved matching logic
+ * Prioritizes: 1) Exact match, 2) Starts with, 3) Contains
  */
 export async function getSuburbsByName(names: string[] | string): Promise<SuburbWithPopulation[]> {
   const suburbs = loadSuburbs();
   const nameArray = Array.isArray(names) ? names : [names];
+  const matched: SuburbWithPopulation[] = [];
+  const addedIds = new Set<number>(); // Prevent duplicates
 
-  return suburbs.filter(suburb => {
-    const suburbNameLower = suburb.name.toLowerCase();
-    return nameArray.some(name =>
-      suburbNameLower.includes(name.toLowerCase())
+  for (const searchName of nameArray) {
+    const searchLower = searchName.trim().toLowerCase();
+
+    // Try exact match first (case-insensitive)
+    let found = suburbs.find(s =>
+      s.name.toLowerCase() === searchLower
     );
-  });
+
+    // If no exact match, try "starts with" match
+    // This handles cases like "Burleigh" → "Burleigh Heads"
+    if (!found) {
+      found = suburbs.find(s =>
+        s.name.toLowerCase().startsWith(searchLower + ' ') ||
+        s.name.toLowerCase().startsWith(searchLower)
+      );
+    }
+
+    // If still no match, try contains match
+    // This handles cases like searching for a partial name
+    if (!found) {
+      found = suburbs.find(s =>
+        s.name.toLowerCase().includes(searchLower)
+      );
+    }
+
+    // If still no match, try removing common prefixes/suffixes and matching again
+    if (!found) {
+      const cleanedSearch = searchLower
+        .replace(/^(north|south|east|west|upper|lower|new|old|mount|mt|port|cape)\s+/i, '')
+        .replace(/\s+(north|south|east|west|heads|waters|beach|park|heights|hills|valley|creek|bay|point|grove|woods|quays|lakes|gardens|downs|ridge|fields|town|city|central|junction|crossing|estate|village)$/i, '');
+
+      found = suburbs.find(s => {
+        const cleanedName = s.name.toLowerCase()
+          .replace(/^(north|south|east|west|upper|lower|new|old|mount|mt|port|cape)\s+/i, '')
+          .replace(/\s+(north|south|east|west|heads|waters|beach|park|heights|hills|valley|creek|bay|point|grove|woods|quays|lakes|gardens|downs|ridge|fields|town|city|central|junction|crossing|estate|village)$/i, '');
+        return cleanedName === cleanedSearch;
+      });
+    }
+
+    if (found && !addedIds.has(found.id)) {
+      matched.push(found);
+      addedIds.add(found.id);
+    } else if (!found) {
+      console.warn(`[Static Suburbs] Suburb not found: "${searchName}"`);
+    }
+  }
+
+  console.log(`[Static Suburbs] Found ${matched.length} of ${nameArray.length} requested suburbs`);
+  return matched;
 }
 
 /**

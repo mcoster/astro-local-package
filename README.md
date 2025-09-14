@@ -2,7 +2,7 @@
 
 A reusable package of Astro components and utilities for building local service provider websites with automatic updates, smart image handling, and location-based content generation.
 
-**Current Version:** 1.0.5
+**Current Version:** 1.0.29
 
 ## Features
 
@@ -165,7 +165,69 @@ colors:
   secondary: 059669
   accent: DC2626
   cta: FF6B35
+
+footer:
+  featured_suburbs:
+    - Salisbury         # Shows single best match by default
+    - Modbury
+    - Burleigh         # Will match "Burleigh Heads" with improved matching
+  suburb_selection_mode: best_match  # or 'all_variations' to show all matches
+  suburb_limit: 15                   # Optional: limit number of suburbs displayed
+  auto_supplement: false              # Optional: disable auto-adding suburbs (default: true)
 ```
+
+### Footer Suburb Selection
+
+The footer displays service area suburbs with flexible configuration options:
+
+#### Configuration Options (v1.0.29+)
+
+```yaml
+footer:
+  featured_suburbs: ["Surfers Paradise", "Broadbeach", "Robina"]
+
+  # Selection mode for handling multiple matches
+  suburb_selection_mode: best_match  # Default: 'best_match'
+  # Options:
+  # - 'best_match': Shows single best match per suburb name
+  # - 'all_variations': Shows all matching variations
+
+  # Maximum suburbs to display (optional)
+  suburb_limit: 20  # No default limit
+
+  # Auto-supplement with smart selection if fewer than 11 suburbs
+  auto_supplement: true  # Default: true
+```
+
+#### Key Features (v1.0.29)
+
+1. **No radius restriction** - Featured suburbs can be outside your service radius
+2. **No forced limits** - Display exactly the number of suburbs you specify
+3. **Duplicate prevention** - Same suburb won't appear twice
+4. **Better matching** - "Burleigh" now correctly matches "Burleigh Heads"
+5. **Flexible display** - Show 5, 11, 15, or any number of suburbs
+
+#### Selection Modes
+
+**Best Match Mode (default):**
+```yaml
+featured_suburbs: ["Salisbury"]
+suburb_selection_mode: best_match
+# Result: Shows only "Salisbury" (or best variant if base doesn't exist)
+```
+
+**All Variations Mode:**
+```yaml
+featured_suburbs: ["Salisbury"]
+suburb_selection_mode: all_variations
+# Result: Shows Salisbury, Salisbury North, Salisbury South, etc.
+```
+
+#### Migration from v1.0.28
+
+- **Default behavior change**: Manual suburbs no longer auto-supplement to 11 unless `auto_supplement: true`
+- **To restore v1.0.28 behavior**: Leave `auto_supplement` as default (true)
+- **To disable auto-supplementing**: Set `auto_supplement: false`
 
 ## Image Processing
 
@@ -369,7 +431,15 @@ const locations = await generateLocations(config);
 
 See [CHANGELOG.md](./CHANGELOG.md) for detailed release notes.
 
-### Latest Updates (v1.0.5)
+### Latest Updates (v1.0.29)
+- **Fixed featured suburbs**: Now correctly fetches ALL specified suburbs, even outside service radius
+- **Flexible display**: No more forced 11 suburb limit - show exactly what you specify
+- **Improved matching**: "Burleigh" now matches "Burleigh Heads" correctly
+- **Duplicate prevention**: Suburbs can't appear twice in the footer
+- **New configuration options**: Control selection mode, limits, and auto-supplementing
+- **Backward compatible**: Default settings maintain v1.0.28 behavior
+
+### Previous Updates (v1.0.5)
 - Fixed footer duplicate location links issue
 - Improved location filtering logic
 - Better handling of main location in footer

@@ -194,6 +194,183 @@ function detectCommercialCenters(suburbs: SuburbWithPopulation[]): Set<number> {
 }
 
 /**
+ * Interface for suburb matching with scoring
+ */
+interface SuburbMatch {
+  suburb: SuburbWithPopulation;
+  isBaseName: boolean;
+  nameMatchScore: number;
+  populationScore: number;
+  distanceScore: number;
+}
+
+/**
+ * Select the best suburb match from multiple variations
+ * Uses priority-based selection:
+ * 1. Highest population
+ * 2. Base name preference (exact match)
+ * 3. Shortest distance from center
+ * 4. Alphabetical
+ */
+function selectBestSuburbMatch(
+  searchTerm: string,
+  matches: SuburbWithPopulation[],
+  centerLat?: number,
+  centerLng?: number
+): SuburbWithPopulation {
+  if (matches.length === 0) {
+    throw new Error(`No matches found for suburb: ${searchTerm}`);
+  }
+
+  if (matches.length === 1) {
+    console.log(`[Footer] Single match for "${searchTerm}": ${matches[0].name}`);
+    return matches[0];
+  }
+
+  // Score each match
+  const scoredMatches: SuburbMatch[] = matches.map(suburb => {
+    const searchTermLower = searchTerm.toLowerCase().trim();
+    const suburbNameLower = suburb.name.toLowerCase();
+
+    // Check if this is the base name (exact match)
+    const isBaseName = suburbNameLower === searchTermLower;
+
+    // Name match score (how closely the name matches)
+    let nameMatchScore = 0;
+    if (isBaseName) {
+      nameMatchScore = 100; // Perfect match
+    } else if (suburbNameLower.startsWith(searchTermLower + ' ')) {
+      nameMatchScore = 50; // Starts with search term
+    } else if (suburbNameLower.includes(searchTermLower)) {
+      nameMatchScore = 25; // Contains search term
+    }
+
+    // Population score (normalized 0-100)
+    const maxPop = Math.max(...matches.map(m => m.population || 0));
+    const populationScore = maxPop > 0 && suburb.population
+      ? (suburb.population / maxPop) * 100
+      : 0;
+
+    // Distance score (inverse, closer is better, normalized 0-100)
+    const maxDist = Math.max(...matches.map(m => m.distanceKm || 0));
+    const distanceScore = maxDist > 0 && suburb.distanceKm !== undefined
+      ? ((maxDist - suburb.distanceKm) / maxDist) * 100
+      : 0;
+
+    return {
+      suburb,
+      isBaseName,
+      nameMatchScore,
+      populationScore,
+      distanceScore
+    };
+  });
+
+  // Sort by priority
+  scoredMatches.sort((a, b) => {
+    // Priority 1: Heavily favor suburbs with population data
+    const aHasPop = (a.suburb.population || 0) > 0;
+    const bHasPop = (b.suburb.population || 0) > 0;
+    if (aHasPop !== bHasPop) {
+      return aHasPop ? -1 : 1;
+    }
+
+    // Priority 2: Population (highest first)
+    if (a.populationScore !== b.populationScore) {
+      return b.populationScore - a.populationScore;
+    }
+
+    // Priority 3: Base name preference
+    if (a.isBaseName !== b.isBaseName) {
+      return a.isBaseName ? -1 : 1;
+    }
+
+    // Priority 4: Name match quality
+    if (a.nameMatchScore !== b.nameMatchScore) {
+      return b.nameMatchScore - a.nameMatchScore;
+    }
+
+    // Priority 5: Distance (closest first)
+    if (a.distanceScore !== b.distanceScore) {
+      return b.distanceScore - a.distanceScore;
+    }
+
+    // Priority 6: Alphabetical
+    return a.suburb.name.localeCompare(b.suburb.name);
+  });
+
+  const selected = scoredMatches[0].suburb;
+
+  // Log the selection decision
+  console.log(`[Footer] Selecting best match for "${searchTerm}" from ${matches.length} options:`);
+  console.log(`  Selected: ${selected.name} (pop: ${selected.population || 'N/A'}, dist: ${selected.distanceKm}km)`);
+  if (scoredMatches.length > 1) {
+    console.log(`  Other options were: ${scoredMatches.slice(1).map(m => m.suburb.name).join(', ')}`);
+  }
+  console.log(`  Reason: ${
+    scoredMatches[0].isBaseName ? 'Base name match' :
+    scoredMatches[0].populationScore > 0 ? `Highest population (${selected.population})` :
+    scoredMatches[0].distanceScore > 0 ? `Closest distance (${selected.distanceKm}km)` :
+    'Alphabetical order'
+  }`);
+
+  return selected;
+}
+
+/**
+ * Process featured suburbs based on selection mode
+ */
+function processFeaturedSuburbs(
+  featuredSuburbNames: string[],
+  allSuburbs: SuburbWithPopulation[],
+  centerLat: number,
+  centerLng: number,
+  selectionMode: 'best_match' | 'all_variations' = 'best_match'
+): SuburbWithPopulation[] {
+  const selectedSuburbs: SuburbWithPopulation[] = [];
+  const addedSuburbIds = new Set<number>(); // Track added suburbs to prevent duplicates
+
+  for (const searchTerm of featuredSuburbNames) {
+    // Find all suburbs that match this search term
+    const matches = allSuburbs.filter(suburb => {
+      const searchLower = searchTerm.toLowerCase().trim();
+      const suburbLower = suburb.name.toLowerCase();
+
+      // Improved matching patterns
+      return suburbLower === searchLower || // Exact match
+             suburbLower.startsWith(searchLower + ' ') || // Starts with term + space (e.g., "Salisbury North")
+             suburbLower.startsWith(searchLower) || // Starts with term (e.g., "Burleigh" → "Burleigh Heads")
+             suburbLower.includes(' ' + searchLower + ' ') || // Contains as word in middle
+             suburbLower.endsWith(' ' + searchLower); // Ends with term
+    });
+
+    if (matches.length === 0) {
+      console.warn(`[Footer] No matches found for featured suburb: "${searchTerm}"`);
+      continue;
+    }
+
+    if (selectionMode === 'all_variations') {
+      // Add all matching suburbs (but prevent duplicates)
+      for (const suburb of matches) {
+        if (!addedSuburbIds.has(suburb.id)) {
+          selectedSuburbs.push(suburb);
+          addedSuburbIds.add(suburb.id);
+        }
+      }
+    } else {
+      // Select the best match (default behavior)
+      const bestMatch = selectBestSuburbMatch(searchTerm, matches, centerLat, centerLng);
+      if (!addedSuburbIds.has(bestMatch.id)) {
+        selectedSuburbs.push(bestMatch);
+        addedSuburbIds.add(bestMatch.id);
+      }
+    }
+  }
+
+  return selectedSuburbs;
+}
+
+/**
  * Analyze distance distribution and find natural rings
  */
 function analyzeDistanceRings(
@@ -380,36 +557,68 @@ export async function getFooterLocations(): Promise<FooterLocationData[]> {
     const manualSuburbs = siteConfig.locationPages.footerFeaturedSuburbs;
     
     if (manualSuburbs && manualSuburbs.length > 0) {
-      console.log(`Using manual footer suburbs: ${manualSuburbs.join(', ')}`);
-      
-      // Query suburbs by name
-      const suburbs = await getSuburbsByName(manualSuburbs as string[]);
-      
-      // Add distance and direction for manual suburbs
-      const suburbsWithDistance = suburbs.map(suburb => 
+      console.log(`[Footer] Using manual footer suburbs: ${manualSuburbs.join(', ')}`);
+
+      // Get the selection mode from config (default to 'best_match')
+      const selectionMode = (siteConfig.locationPages as any).suburbSelectionMode || 'best_match';
+      const suburbLimit = (siteConfig.locationPages as any).suburbLimit;
+      const autoSupplement = (siteConfig.locationPages as any).autoSupplement !== false; // Default true for backward compatibility
+
+      // Fetch ALL requested suburbs using getSuburbsByName (not limited to radius)
+      const requestedSuburbs = await getSuburbsByName(manualSuburbs as string[]);
+
+      // Add distance and direction for all suburbs
+      const suburbsWithDistance = requestedSuburbs.map(suburb =>
         calculateDistanceAndDirection(suburb, center.lat, center.lng)
       );
-      
-      // Filter to only those within service radius
-      const validSuburbs = suburbsWithDistance.filter(s => s.distanceKm <= radiusKm);
-      
-      if (validSuburbs.length < manualSuburbs.length) {
-        console.warn(`Some manual suburbs not found or outside service radius. Found ${validSuburbs.length} of ${manualSuburbs.length}`);
+
+      // Process featured suburbs based on selection mode
+      const selectedSuburbs = processFeaturedSuburbs(
+        manualSuburbs as string[],
+        suburbsWithDistance,
+        center.lat,
+        center.lng,
+        selectionMode
+      );
+
+      // Log any suburbs that are outside the service radius (informational only)
+      const outsideRadius = selectedSuburbs.filter(s => s.distanceKm > radiusKm);
+      if (outsideRadius.length > 0) {
+        console.log(`[Footer] Note: ${outsideRadius.length} suburbs are outside the ${radiusKm}km service radius:`);
+        outsideRadius.forEach(s => console.log(`  - ${s.name}: ${s.distanceKm}km`));
       }
-      
-      // If we have fewer than 11, supplement with smart selection
-      let finalSuburbs = validSuburbs;
-      if (validSuburbs.length < 11) {
-        const allSuburbs = await getSuburbsWithPopulation(center.lat, center.lng, radiusKm);
+
+      if (selectedSuburbs.length < manualSuburbs.length) {
+        console.warn(`[Footer] Some featured suburbs not found. Found ${selectedSuburbs.length} of ${manualSuburbs.length}`);
+        const foundNames = selectedSuburbs.map(s => s.name.toLowerCase());
+        const missingSuburbs = manualSuburbs.filter(name =>
+          !foundNames.some(found => found.includes(name.toLowerCase()) || name.toLowerCase().includes(found))
+        );
+        if (missingSuburbs.length > 0) {
+          console.warn(`[Footer] Missing suburbs: ${missingSuburbs.join(', ')}`);
+        }
+      }
+
+      let finalSuburbs = selectedSuburbs;
+
+      // Only supplement if autoSupplement is enabled and we have fewer than 11 suburbs
+      if (autoSupplement && selectedSuburbs.length < 11) {
+        console.log(`[Footer] Auto-supplementing with ${11 - selectedSuburbs.length} additional suburbs via smart selection`);
+        const allSuburbsInRadius = await getSuburbsWithPopulation(center.lat, center.lng, radiusKm);
         const additionalSuburbs = smartSelectLocations(
-          allSuburbs.filter(s => !validSuburbs.some(v => v.id === s.id)),
-          11 - validSuburbs.length,
+          allSuburbsInRadius.filter(s => !selectedSuburbs.some(v => v.id === s.id)),
+          11 - selectedSuburbs.length,
           center
         );
-        finalSuburbs = [...validSuburbs, ...additionalSuburbs];
+        finalSuburbs = [...selectedSuburbs, ...additionalSuburbs];
       }
-      
-      return finalSuburbs.slice(0, 11).map(suburb => ({
+
+      // Apply suburb limit if specified, otherwise show all
+      if (suburbLimit && suburbLimit > 0) {
+        finalSuburbs = finalSuburbs.slice(0, suburbLimit);
+      }
+
+      return finalSuburbs.map(suburb => ({
         suburb,
         slug: generateLocationSlug(suburb),
         url: generateLocationUrl(suburb)

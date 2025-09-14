@@ -83,6 +83,9 @@ interface BusinessConfig {
   };
   footer: {
     featured_suburbs?: string[];
+    suburb_selection_mode?: 'best_match' | 'all_variations';
+    suburb_limit?: number;
+    auto_supplement?: boolean;
   };
 }
 
@@ -201,6 +204,9 @@ export const siteConfig = {
     centerLat: getConfigValue('service.center_lat', 'SERVICE_CENTER_LAT', undefined),
     centerLng: getConfigValue('service.center_lng', 'SERVICE_CENTER_LNG', undefined),
     footerFeaturedSuburbs: getConfigValue('footer.featured_suburbs', 'FOOTER_FEATURED_SUBURBS', []),
+    suburbSelectionMode: getConfigValue('footer.suburb_selection_mode', 'SUBURB_SELECTION_MODE', 'best_match'),
+    suburbLimit: getConfigValue('footer.suburb_limit', 'SUBURB_LIMIT', undefined),
+    autoSupplement: getConfigValue('footer.auto_supplement', 'AUTO_SUPPLEMENT', true),
   },
   
   // Computed values
