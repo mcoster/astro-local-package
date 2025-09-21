@@ -11,6 +11,7 @@ import { Pool } from 'pg';
 import fs from 'fs/promises';
 import path from 'path';
 import * as dotenv from 'dotenv';
+import * as yaml from 'js-yaml';
 
 // Load environment variables
 dotenv.config();
@@ -27,8 +28,31 @@ interface Suburb {
   population?: number;
 }
 
+/**
+ * Calculate a simple hash of relevant config values
+ */
+function calculateConfigHash(config: any): string {
+  const relevant = {
+    lat: config.service?.center_lat || config.address?.coordinates?.lat,
+    lng: config.service?.center_lng || config.address?.coordinates?.lng,
+    radius: config.service?.radius_km || config.seo?.location_based?.radius_km || config.locationPages?.serviceRadiusKm,
+  };
+  return JSON.stringify(relevant);
+}
+
 async function exportSuburbs() {
+  // Check for --force flag
+  const forceRegenerate = process.argv.includes('--force');
+  
   console.log('🏘️  Exporting suburbs from PostGIS database...\n');
+  if (forceRegenerate) {
+    console.log('   🔄 Force regeneration mode\n');
+  }
+
+  // Load business config
+  const configPath = path.join(process.cwd(), 'config', 'business.yaml');
+  const configContent = await fs.readFile(configPath, 'utf8');
+  const config = yaml.load(configContent) as any;
 
   // Database connection
   const pool = new Pool({
@@ -40,10 +64,10 @@ async function exportSuburbs() {
   });
 
   try {
-    // Get center location (Adelaide business address)
-    const centerLat = -34.8517; // Kilburn, SA
-    const centerLng = 138.5829;
-    const radiusKm = 50; // Export suburbs within 50km
+    // Get center location from config
+    const centerLat = config.service?.center_lat || config.address?.coordinates?.lat || -34.8517;
+    const centerLng = config.service?.center_lng || config.address?.coordinates?.lng || 138.5829;
+    const radiusKm = config.service?.radius_km || config.locationPages?.serviceRadiusKm || 33;
 
     console.log(`📍 Center: ${centerLat}, ${centerLng}`);
     console.log(`📏 Radius: ${radiusKm}km\n`);
@@ -56,7 +80,7 @@ async function exportSuburbs() {
       SELECT 
         s.id,
         s.name,
-        s.postcode,
+        sp.postcode,
         s.state,
         s.latitude,
         s.longitude,
@@ -75,24 +99,43 @@ async function exportSuburbs() {
         s.population
       FROM suburbs s
       CROSS JOIN center c
-      WHERE s.state = 'SA'
-        AND ST_DWithin(s.location, c.point, $3 * 1000)
+      LEFT JOIN suburb_postcodes sp ON s.id = sp.suburb_id AND sp.is_primary = true
+      WHERE ST_DWithin(s.location, c.point, $3 * 1000)
       ORDER BY distance_km ASC
     `;
 
     const result = await pool.query(query, [centerLat, centerLng, radiusKm]);
     
-    const suburbs: Suburb[] = result.rows.map(row => ({
-      id: row.id,
-      name: row.name,
-      postcode: row.postcode,
-      state: row.state,
-      latitude: parseFloat(row.latitude),
-      longitude: parseFloat(row.longitude),
-      distanceKm: parseFloat(row.distance_km),
-      direction: row.direction,
-      population: row.population || null,
-    }));
+    const suburbs: Suburb[] = result.rows
+      .filter(row => {
+        // Filter out cadastral/section identifiers that aren't real suburb names
+        const name = row.name;
+
+        // Exclude entries that start with a digit (e.g., "1A", "2B", "3 ANZAC")
+        if (/^[0-9]/.test(name)) {
+          console.log(`   ⚠️  Filtering out invalid suburb: ${name}`);
+          return false;
+        }
+
+        // Exclude entries that start with L followed by digits (e.g., "L10", "L23")
+        if (/^L[0-9]/.test(name)) {
+          console.log(`   ⚠️  Filtering out invalid suburb: ${name}`);
+          return false;
+        }
+
+        return true;
+      })
+      .map(row => ({
+        id: row.id,
+        name: row.name,
+        postcode: row.postcode,
+        state: row.state,
+        latitude: parseFloat(row.latitude),
+        longitude: parseFloat(row.longitude),
+        distanceKm: parseFloat(row.distance_km),
+        direction: row.direction,
+        population: row.population || null,
+      }));
 
     console.log(`✅ Found ${suburbs.length} suburbs within ${radiusKm}km\n`);
 
@@ -107,6 +150,9 @@ async function exportSuburbs() {
       center: { lat: centerLat, lng: centerLng },
       radiusKm,
       count: suburbs.length,
+      // Don't include state field - suburbs can span multiple states
+      configHash: calculateConfigHash(config),
+      source: 'database',
       suburbs,
     };
 
