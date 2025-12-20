@@ -114,35 +114,36 @@ const getIcon = (iconName: string) => {
   .icon-grid__grid {
     display: grid;
     gap: 2rem;
+    justify-content: center;
   }
 
   @media (min-width: 640px) {
     .icon-grid__grid--2 {
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: repeat(2, minmax(auto, 280px));
     }
 
     .icon-grid__grid--3 {
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: repeat(2, minmax(auto, 280px));
     }
 
     .icon-grid__grid--4 {
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: repeat(2, minmax(auto, 280px));
     }
   }
 
   @media (min-width: 768px) {
     .icon-grid__grid--3 {
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(3, minmax(auto, 280px));
     }
 
     .icon-grid__grid--4 {
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(3, minmax(auto, 280px));
     }
   }
 
   @media (min-width: 1024px) {
     .icon-grid__grid--4 {
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(4, minmax(auto, 280px));
     }
   }
 
