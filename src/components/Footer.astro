@@ -44,8 +44,10 @@ const legalLinks = [
               {siteConfig.phone}
             </a>
           </p>
-          <p class="text-gray-300">
-            {siteConfig.email}
+          <p class="text-gray-300 break-all">
+            <a href={`mailto:${siteConfig.email}`} title={`Email ${siteConfig.businessName}`} class="hover:text-white transition-colors">
+              {siteConfig.email}
+            </a>
           </p>
         </div>
         
