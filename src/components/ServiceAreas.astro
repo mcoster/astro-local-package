@@ -103,28 +103,28 @@ const displayLocations = showAllAreas ? locations : locations.slice(0, limit);
   }
 
   .service-areas__list {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
     gap: 1rem;
     margin-bottom: 2rem;
     justify-content: center;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 220px));
   }
 
   @media (min-width: 640px) {
-    .service-areas__item {
-      flex: 0 1 calc(50% - 0.5rem);
+    .service-areas__list {
+      grid-template-columns: repeat(2, 200px);
     }
   }
 
   @media (min-width: 768px) {
-    .service-areas__item {
-      flex: 0 1 calc(33.333% - 0.667rem);
+    .service-areas__list {
+      grid-template-columns: repeat(3, 200px);
     }
   }
 
   @media (min-width: 1024px) {
-    .service-areas__item {
-      flex: 0 1 calc(25% - 0.75rem);
+    .service-areas__list {
+      grid-template-columns: repeat(4, 200px);
     }
   }
 

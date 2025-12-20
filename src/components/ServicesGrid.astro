@@ -175,89 +175,33 @@ const gridClass = layout === 'auto'
     }
   }
 
-  /* Flexbox base layout */
+  /* CSS Grid layout with fixed widths for proper centering */
   .services-grid {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
     gap: 1.5rem;
     justify-content: center;
+    grid-template-columns: 1fr;
   }
 
-  /* Auto layout - cards size themselves based on available space */
-  .services-grid--auto :global(.service-card) {
-    flex: 1 1 var(--min-card-width);
-    max-width: var(--max-card-width);
-  }
-
-  /* Specific count optimizations for auto layout */
-  /* 2 services: Don't stretch too wide */
-  .services-grid--auto.services-grid--count-2 :global(.service-card) {
-    flex: 0 1 350px;
-    max-width: 400px;
-  }
-
-  /* 5 services: 3+2 layout is better than 4+1 */
-  .services-grid--auto.services-grid--count-5 :global(.service-card) {
-    flex: 0 1 calc(33.333% - 1rem);
-    min-width: var(--min-card-width);
-    max-width: var(--max-card-width);
-  }
-
-  /* 7 services: Responsive 4+3 or 3+2+2 */
-  @media (min-width: 1200px) {
-    .services-grid--auto.services-grid--count-7 :global(.service-card) {
-      flex: 0 1 calc(25% - 1.125rem);
-      min-width: var(--min-card-width);
+  /* 2 columns on small screens */
+  @media (min-width: 640px) {
+    .services-grid {
+      grid-template-columns: repeat(2, 320px);
     }
   }
 
-  /* Fixed column layouts */
-  .services-grid--2 :global(.service-card) {
-    flex: 0 1 calc(50% - 0.75rem);
-    min-width: var(--min-card-width);
-  }
-
-  .services-grid--3 :global(.service-card) {
-    flex: 0 1 calc(33.333% - 1rem);
-    min-width: var(--min-card-width);
-  }
-
-  .services-grid--4 :global(.service-card) {
-    flex: 0 1 calc(25% - 1.125rem);
-    min-width: var(--min-card-width);
-  }
-
-  /* Responsive breakpoints */
-  @media (max-width: 1024px) {
-    .services-grid--4 :global(.service-card) {
-      flex: 0 1 calc(33.333% - 1rem);
-    }
-    
-    .services-grid--auto.services-grid--count-7 :global(.service-card) {
-      flex: 0 1 calc(33.333% - 1rem);
+  /* 3 columns on medium screens */
+  @media (min-width: 1024px) {
+    .services-grid {
+      grid-template-columns: repeat(3, 320px);
     }
   }
 
-  @media (max-width: 768px) {
-    .services-grid--3 :global(.service-card),
-    .services-grid--4 :global(.service-card) {
-      flex: 0 1 calc(50% - 0.75rem);
-    }
-    
-    .services-grid--auto.services-grid--count-5 :global(.service-card),
-    .services-grid--auto.services-grid--count-7 :global(.service-card) {
-      flex: 0 1 calc(50% - 0.75rem);
-    }
-  }
-
-  @media (max-width: 640px) {
+  /* Smaller screens: single column, full width */
+  @media (max-width: 639px) {
     .services-grid {
       gap: 1rem;
-    }
-    
-    .services-grid :global(.service-card) {
-      flex: 0 1 100%;
-      max-width: 100%;
+      grid-template-columns: 1fr;
     }
   }
   
