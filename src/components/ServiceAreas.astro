@@ -82,6 +82,7 @@ const displayLocations = showAllAreas ? locations : locations.slice(0, limit);
 
 <style>
   .service-areas {
+    display: block; /* Explicitly set to block to ensure margin: auto works on children */
     /* Padding now handled by Section component */
   }
 
