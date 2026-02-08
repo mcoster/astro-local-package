@@ -16,7 +16,7 @@ const { title, description, icon, image, href } = Astro.props;
 let serviceImage;
 if (image && image.startsWith('/images/')) {
   try {
-    const images = import.meta.glob<{ default: ImageMetadata }>('/public/images/*');
+    const images = import.meta.glob<{ default: ImageMetadata }>('/public/images/**/*');
     const imagePath = `/public${image}`;
     if (images[imagePath]) {
       serviceImage = (await images[imagePath]()).default;
