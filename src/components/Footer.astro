@@ -133,7 +133,7 @@ const legalLinks = [
         <ul class="space-y-2">
           {sortedServices.map((service) => (
             <li>
-              <a href={`/services/${service.slug}`} title={`${service.data.title} services in ${siteConfig.mainLocation}`} class="text-sm hover:text-white transition-colors">
+              <a href={`/services/${service.slug}`} title={siteConfig.entireCountry ? `${service.data.title} services nationwide` : `${service.data.title} services in ${siteConfig.mainLocation}`} class="text-sm hover:text-white transition-colors">
                 {service.data.title}
               </a>
             </li>
@@ -147,8 +147,8 @@ const legalLinks = [
         <ul class="space-y-1">
           <!-- Main location linking to homepage -->
           <li>
-            <a href="/" title={`Services in ${siteConfig.mainLocation}`} class="text-sm hover:text-white transition-colors font-semibold">
-              {siteConfig.mainLocation}
+            <a href={siteConfig.entireCountry ? "/locations/" : "/"} title={siteConfig.entireCountry ? "Nationwide service areas" : `Services in ${siteConfig.mainLocation}`} class="text-sm hover:text-white transition-colors font-semibold">
+              {siteConfig.entireCountry ? "Nationwide Service" : siteConfig.mainLocation}
             </a>
           </li>
           <!-- Dynamic location links -->
