@@ -20,13 +20,20 @@ export interface Props {
   blocks: ContentBlock[];
   alternateBackground?: boolean;
   defaultBackground?: 'white' | 'gray';
+  headingLevel?: 'h2' | 'h3';
 }
 
-const { 
-  blocks, 
+const {
+  blocks,
   alternateBackground = true,
-  defaultBackground = 'white'
+  defaultBackground = 'white',
+  headingLevel = 'h2'
 } = Astro.props;
+
+const HeadingTag = headingLevel;
+const headingClass = headingLevel === 'h3'
+  ? 'text-2xl md:text-3xl font-bold mb-6 text-gray-900'
+  : 'text-3xl md:text-4xl font-bold mb-6 text-gray-900';
 
 // Process blocks with alternating backgrounds if enabled
 const processedBlocks = blocks.map((block, index) => {
@@ -56,7 +63,7 @@ const processedBlocks = blocks.map((block, index) => {
           <div class={`content-block__grid content-block__grid--${imagePosition}`}>
             <div class="content-block__content">
               {block.heading && (
-                <h2 class="text-3xl md:text-4xl font-bold mb-6 text-gray-900">{block.heading}</h2>
+                <HeadingTag class={headingClass}>{block.heading}</HeadingTag>
               )}
               <div class="prose prose-lg text-gray-600 max-w-none" set:html={htmlContent} />
               {block.cta && (
@@ -113,6 +120,7 @@ const processedBlocks = blocks.map((block, index) => {
   }
   
   .content-block--bg-gradient h2,
+  .content-block--bg-gradient h3,
   .content-block--bg-gradient .prose,
   .content-block--bg-gradient .prose strong {
     @apply text-white;
