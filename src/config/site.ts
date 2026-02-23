@@ -197,6 +197,10 @@ export const siteConfig = {
     cta: `#${getConfigValue('colors.cta', 'PUBLIC_COLOR_CTA', 'FF6B35')}`,
   } as Colors,
   
+  // Feature flags
+  formEnabled: getConfigValue('features.form_enabled', 'PUBLIC_FORM_ENABLED', true) as boolean,
+  entireCountry: getConfigValue('features.entire_country', 'PUBLIC_ENTIRE_COUNTRY', false) as boolean,
+
   // Location Page Generation Settings
   locationPages: {
     serviceRadiusKm: getConfigValue('service.radius_km', 'SERVICE_RADIUS_KM', 50),
