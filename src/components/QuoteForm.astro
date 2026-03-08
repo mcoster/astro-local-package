@@ -5,6 +5,7 @@ export interface Props {
   submitText?: string;
   redirectTo?: string;
   standalone?: boolean;
+  roofTypes?: string[];
 }
 
 import { siteConfig } from '../config/site';
@@ -15,9 +16,28 @@ const {
   submitText = 'SUBMIT >>',
   redirectTo = '/thank-you',
   standalone = true,
+  roofTypes = [],
 } = Astro.props;
 
 const containerClass = standalone ? 'quote-form-section py-4' : '';
+
+// Derive country code for Places Autocomplete
+function deriveCountryCode(country?: string): string | undefined {
+  const map: Record<string, string> = {
+    'australia': 'au',
+    'united states': 'us',
+    'usa': 'us',
+    'new zealand': 'nz',
+    'canada': 'ca',
+    'united kingdom': 'gb',
+  };
+  return country ? map[country.toLowerCase()] : undefined;
+}
+
+const countryCode = siteConfig.address.countryCode
+  || deriveCountryCode(siteConfig.address.country)
+  || 'au';
+const placesApiKey = siteConfig.googleMaps.placesApiKey;
 ---
 
 <div class={containerClass}>
@@ -82,14 +102,32 @@ const containerClass = standalone ? 'quote-form-section py-4' : '';
       />
       
       <!-- Service Area / Location -->
-      <input
-        type="text"
-        id="location"
-        name="location"
-        required
-        class="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary text-base"
-        placeholder={`Location: eg. ${siteConfig.formLocation || 'Your Suburb'}`}
-      />
+      <div id="location-container" data-country={countryCode} data-placeholder={`Location: eg. ${siteConfig.formLocation || 'Your Suburb'}`}>
+        <input
+          type="text"
+          id="location"
+          name="location"
+          required
+          class="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary text-base"
+          placeholder={`Location: eg. ${siteConfig.formLocation || 'Your Suburb'}`}
+          data-country={countryCode}
+        />
+      </div>
+
+      {roofTypes.length > 0 && (
+        <!-- Roof Type Selector -->
+        <select
+          id="roof_type"
+          name="roof_type"
+          required
+          class="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary text-base bg-white"
+        >
+          <option value="" disabled selected>Roof Type*</option>
+          {roofTypes.map((type) => (
+            <option value={type}>{type}</option>
+          ))}
+        </select>
+      )}
       
       <!-- Description Field -->
       <div>
@@ -124,6 +162,115 @@ const containerClass = standalone ? 'quote-form-section py-4' : '';
   </div>
 </div>
 
+{placesApiKey && (
+  <script is:inline define:vars={{ placesApiKey }}>
+    // Google Maps Dynamic Library Import (recommended bootstrap loader)
+    (function(g) {
+      var h, a, k, p = "The Google Maps JavaScript API", c = "google", l = "importLibrary",
+          q = "__ib__", m = document, b = window;
+      b = b[c] || (b[c] = {});
+      var d = b.maps || (b.maps = {}), r = new Set, e = new URLSearchParams,
+          u = function() {
+            return h || (h = new Promise(function(f, n) {
+              a = m.createElement("script");
+              e.set("libraries", [].concat(Array.from(r)).join(","));
+              for (k in g) e.set(k.replace(/[A-Z]/g, function(t) { return "_" + t[0].toLowerCase(); }), g[k]);
+              e.set("callback", c + ".maps." + q);
+              a.src = "https://maps.googleapis.com/maps/api/js?" + e;
+              d[q] = f;
+              a.onerror = function() { h = n(Error(p + " could not load.")); };
+              a.nonce = (m.querySelector("script[nonce]") || {}).nonce || "";
+              m.head.append(a);
+            }));
+          };
+      d[l] ? console.warn(p + " only loads once. Ignoring:", g) : d[l] = function(f) {
+        r.add(f);
+        return u().then(function() { return d[l](f); });
+      };
+    })({ key: placesApiKey, v: "weekly" });
+
+    // Initialize Places Autocomplete once library is loaded
+    (async function() {
+      try {
+        await google.maps.importLibrary("places");
+      } catch (e) {
+        console.warn('Google Places API failed to load, using fallback input');
+        return;
+      }
+
+      if (!google.maps.places.PlaceAutocompleteElement) {
+        console.warn('PlaceAutocompleteElement not available, using fallback input');
+        return;
+      }
+
+      var container = document.getElementById('location-container');
+      var fallbackInput = document.getElementById('location');
+      if (!container || !fallbackInput) return;
+
+      var country = container.getAttribute('data-country') || 'au';
+
+      var placeholder = container.getAttribute('data-placeholder') || 'Search location...';
+      var autocomplete = new google.maps.places.PlaceAutocompleteElement({
+        includedRegionCodes: [country],
+        includedPrimaryTypes: ['locality', 'sublocality', 'postal_code', 'administrative_area_level_3'],
+      });
+      autocomplete.setAttribute('placeholder', placeholder);
+      autocomplete.style.width = '100%';
+      autocomplete.style.display = 'block';
+      autocomplete.style.height = 'auto';
+      autocomplete.style.minHeight = '48px';
+      autocomplete.style.padding = '0.75rem 1rem';
+      autocomplete.style.border = '1px solid #d1d5db';
+      autocomplete.style.borderRadius = '0.375rem';
+      autocomplete.style.fontSize = '1rem';
+      autocomplete.style.boxSizing = 'border-box';
+
+      // Hidden input for form submission
+      var hiddenInput = document.createElement('input');
+      hiddenInput.type = 'hidden';
+      hiddenInput.name = 'location';
+      hiddenInput.id = 'location-hidden';
+
+      // Listen for place selection
+      autocomplete.addEventListener('gmp-select', async function(event) {
+        var place = event.placePrediction.toPlace();
+        await place.fetchFields({ fields: ['displayName', 'formattedAddress'] });
+        hiddenInput.value = place.displayName || place.formattedAddress || '';
+      });
+
+      // Append autocomplete element hidden initially, verify it renders before swapping
+      autocomplete.style.position = 'absolute';
+      autocomplete.style.visibility = 'hidden';
+      container.style.position = 'relative';
+      container.appendChild(autocomplete);
+
+      // Wait for the element to fully initialize, then swap if it rendered properly
+      // PlaceAutocompleteElement uses a closed Shadow DOM, so .shadowRoot returns null.
+      // Instead, check if the element has grown in size (rendered content inside).
+      var checkCount = 0;
+      var maxChecks = 10;
+      var checkInterval = setInterval(function() {
+        checkCount++;
+        var hasRendered = autocomplete.offsetHeight > 10 || autocomplete.children.length > 0;
+        if (hasRendered) {
+          clearInterval(checkInterval);
+          // Element rendered - swap in
+          fallbackInput.removeAttribute('name');
+          fallbackInput.removeAttribute('required');
+          fallbackInput.style.display = 'none';
+          autocomplete.style.position = '';
+          autocomplete.style.visibility = '';
+          container.appendChild(hiddenInput);
+        } else if (checkCount >= maxChecks) {
+          clearInterval(checkInterval);
+          autocomplete.remove();
+          console.info('Places Autocomplete did not render, keeping fallback input');
+        }
+      }, 300);
+    })();
+  </script>
+)}
+
 <style>
   .quote-form-section {
     display: block;
@@ -141,6 +288,24 @@ const containerClass = standalone ? 'quote-form-section py-4' : '';
     color: var(--color-primary);
   }
   
+  /* Style the Google Places Autocomplete element to match form inputs */
+  gmp-place-autocomplete {
+    width: 100%;
+    display: block;
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    font-size: 1rem;
+    line-height: 1.5rem;
+    background-color: white;
+    color-scheme: light;
+  }
+  gmp-place-autocomplete:focus-within {
+    --tw-ring-color: var(--color-primary);
+    outline: 2px solid var(--tw-ring-color);
+    outline-offset: 2px;
+    border-color: var(--color-primary);
+  }
+
   /* Elegant layered shadow for form depth */
   .quote-form-shadow {
     box-shadow: 

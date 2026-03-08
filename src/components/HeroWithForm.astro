@@ -7,6 +7,7 @@ export interface Props {
   formTitle?: string;
   formDescription?: string;
   templateData?: Record<string, any>;  // Optional custom template data
+  roofTypes?: string[];
 }
 
 import { siteConfig } from '../config/site';
@@ -21,6 +22,7 @@ const {
   formTitle = 'Get Started Today!',
   formDescription = '',
   templateData,
+  roofTypes,
 } = Astro.props;
 
 // Create template processor with site config data
@@ -82,10 +84,11 @@ const processedSubtitle = processor.processString(subtitle);
         
         <!-- Quote Form (40% on desktop) -->
         <div class="lg:col-span-2">
-          <QuoteForm 
+          <QuoteForm
             formTitle={formTitle}
             formDescription={formDescription}
             standalone={false}
+            roofTypes={roofTypes}
           />
         </div>
         

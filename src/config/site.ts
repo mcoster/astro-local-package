@@ -24,6 +24,7 @@ interface Address {
   state: string;
   postcode: string;
   country: string;
+  countryCode?: string;
 }
 
 interface SocialLinks {
@@ -155,6 +156,7 @@ export const siteConfig = {
     state: getConfigValue('address.state', 'PUBLIC_STATE', 'State'),
     postcode: getConfigValue('address.postcode', 'PUBLIC_POSTCODE', '5000'),
     country: getConfigValue('address.country', 'PUBLIC_COUNTRY', 'Australia'),
+    countryCode: getConfigValue('address.country_code', 'PUBLIC_COUNTRY_CODE', undefined),
   } as Address,
   
   // Business Hours
@@ -186,6 +188,7 @@ export const siteConfig = {
     embed: getConfigValue('google_maps.embed', 'PUBLIC_GOOGLE_MAPS_EMBED', undefined),
     placeId: import.meta.env.PUBLIC_GOOGLE_MAPS_PLACE_ID || undefined,
     apiKey: import.meta.env.PUBLIC_GOOGLE_MAPS_API_KEY || undefined,
+    placesApiKey: import.meta.env.PUBLIC_GOOGLE_PLACES_API_KEY || undefined,
     discoveredCache: import.meta.env.GOOGLE_MAPS_DISCOVERED_CACHE || undefined,
   },
   
@@ -197,10 +200,6 @@ export const siteConfig = {
     cta: `#${getConfigValue('colors.cta', 'PUBLIC_COLOR_CTA', 'FF6B35')}`,
   } as Colors,
   
-  // Feature flags
-  formEnabled: getConfigValue('features.form_enabled', 'PUBLIC_FORM_ENABLED', true) as boolean,
-  entireCountry: getConfigValue('features.entire_country', 'PUBLIC_ENTIRE_COUNTRY', false) as boolean,
-
   // Location Page Generation Settings
   locationPages: {
     serviceRadiusKm: getConfigValue('service.radius_km', 'SERVICE_RADIUS_KM', 50),
@@ -212,7 +211,11 @@ export const siteConfig = {
     suburbLimit: getConfigValue('footer.suburb_limit', 'SUBURB_LIMIT', undefined),
     autoSupplement: getConfigValue('footer.auto_supplement', 'AUTO_SUPPLEMENT', true),
   },
-  
+
+  // Feature flags
+  formEnabled: getConfigValue('features.form_enabled', 'PUBLIC_FORM_ENABLED', true) as boolean,
+  entireCountry: getConfigValue('features.entire_country', 'PUBLIC_ENTIRE_COUNTRY', false) as boolean,
+
   // Computed values
   get formattedPhone() {
     // Remove all non-digits from phone number
