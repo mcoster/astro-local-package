@@ -118,8 +118,9 @@ const placesApiKey = siteConfig.googleMaps.placesApiKey;
           id="roof_type"
           name="roof_type"
           required
-          class="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary text-base bg-white text-gray-400"
-          onchange="this.classList.toggle('text-gray-400', !this.value); this.classList.toggle('text-gray-900', !!this.value);"
+          class="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary text-base bg-white"
+          style="color: rgba(0, 0, 0, 0.5);"
+          onchange="this.style.color = this.value ? '' : 'rgba(0, 0, 0, 0.5)';"
         >
           <option value="" disabled selected>Roof Type*</option>
           {roofTypes.map((type) => (
