@@ -8,6 +8,7 @@ export interface Props {
   formDescription?: string;
   templateData?: Record<string, any>;  // Optional custom template data
   roofTypes?: string[];
+  roofHeights?: string[];
 }
 
 import { siteConfig } from '../config/site';
@@ -23,6 +24,7 @@ const {
   formDescription = '',
   templateData,
   roofTypes,
+  roofHeights,
 } = Astro.props;
 
 // Create template processor with site config data
@@ -89,6 +91,7 @@ const processedSubtitle = processor.processString(subtitle);
             formDescription={formDescription}
             standalone={false}
             roofTypes={roofTypes}
+            roofHeights={roofHeights}
           />
         </div>
         
