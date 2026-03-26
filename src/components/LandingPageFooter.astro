@@ -1,0 +1,64 @@
+---
+export interface Props {
+  links?: Array<{ label: string; href: string }>;
+}
+
+const {
+  links = [
+    { label: 'Home', href: '/' },
+    { label: 'Privacy Policy', href: '/privacy' },
+    { label: 'Terms and Conditions', href: '/terms' },
+    { label: 'Contact Us', href: '/contact' },
+  ],
+} = Astro.props;
+---
+
+<footer class="lp-footer">
+  <div class="lp-footer__container">
+    <p class="lp-footer__links">
+      {links.map((link, i) => (
+        <>
+          <a
+            href={link.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="lp-footer__link"
+          >{link.label}</a>
+          {i < links.length - 1 && <span class="lp-footer__sep"> – </span>}
+        </>
+      ))}
+    </p>
+  </div>
+</footer>
+
+<style>
+  .lp-footer {
+    border-top: 1px solid #e5e7eb;
+    padding: 1.5rem 1rem;
+    text-align: center;
+  }
+
+  .lp-footer__container {
+    max-width: 80rem;
+    margin: 0 auto;
+  }
+
+  .lp-footer__links {
+    font-size: 0.85rem;
+    color: #6b7280;
+  }
+
+  .lp-footer__link {
+    color: #6b7280;
+    text-decoration: underline;
+    transition: color 150ms ease;
+  }
+
+  .lp-footer__link:hover {
+    color: var(--color-primary, #1E40AF);
+  }
+
+  .lp-footer__sep {
+    color: #9ca3af;
+  }
+</style>

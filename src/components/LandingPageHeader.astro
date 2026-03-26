@@ -1,0 +1,68 @@
+---
+export interface Props {
+  logo?: string;
+  trustPhrase?: string;
+}
+
+import { siteConfig } from '../config/site';
+
+const {
+  logo = siteConfig.businessLogo || '/images/logo.png',
+  trustPhrase = '',
+} = Astro.props;
+---
+
+<header class="lp-header">
+  <div class="lp-header__container">
+    <div class="lp-header__logo">
+      <img
+        src={logo}
+        alt={`${siteConfig.businessName} Logo`}
+        class="lp-header__logo-img"
+        loading="eager"
+      />
+    </div>
+    {trustPhrase && (
+      <div class="lp-header__trust">
+        <em>{trustPhrase}</em>
+      </div>
+    )}
+  </div>
+</header>
+
+<style>
+  .lp-header {
+    background: white;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 0.75rem 1rem;
+  }
+
+  .lp-header__container {
+    max-width: 80rem;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .lp-header__logo-img {
+    height: 40px;
+    width: auto;
+  }
+
+  .lp-header__trust {
+    color: var(--color-primary, #1E40AF);
+    font-size: 0.9rem;
+  }
+
+  @media (max-width: 639px) {
+    .lp-header__container {
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .lp-header__trust {
+      font-size: 0.8rem;
+    }
+  }
+</style>

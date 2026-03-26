@@ -1,0 +1,178 @@
+---
+export interface Props {
+  title?: string;
+  subtitle?: string;
+  backgroundImage?: string;
+  overlayOpacity?: number;
+  formTitle?: string;
+  formDescription?: string;
+  submitText?: string;
+  redirectTo?: string;
+  roofTypes?: string[];
+  roofHeights?: string[];
+  benefits?: Array<{ icon: string; title: string; description: string }>;
+  dkiEnabled?: boolean;
+  dkiTemplate?: string;
+  templateData?: Record<string, any>;
+}
+
+import { siteConfig } from '../config/site';
+import { TemplateProcessor } from '../utils/template-processor';
+import { getIcon } from '../utils/icon-map';
+import QuoteForm from './QuoteForm.astro';
+
+const {
+  title = `Professional Services on the ${siteConfig.mainLocation}`,
+  subtitle = siteConfig.tagline,
+  backgroundImage = '/images/hero-bg.jpg',
+  overlayOpacity = 0.7,
+  formTitle = 'Get Your Free Quote',
+  formDescription = '',
+  submitText = 'Get My Free Quote >>',
+  redirectTo = '/thank-you',
+  roofTypes,
+  roofHeights,
+  benefits = [],
+  dkiEnabled = true,
+  dkiTemplate = '',
+  templateData,
+} = Astro.props;
+
+// Create template processor with site config data
+const processor = new TemplateProcessor({
+  businessName: siteConfig.businessName,
+  mainLocation: siteConfig.mainLocation,
+  phone: siteConfig.phone,
+  formattedPhone: siteConfig.formattedPhone,
+  email: siteConfig.email,
+  serviceRadius: String(siteConfig.locationPages.serviceRadiusKm),
+  ...templateData,
+});
+
+const processedTitle = processor.processString(title);
+const processedSubtitle = processor.processString(subtitle);
+---
+
+<section class="lp-hero relative overflow-hidden">
+  <!-- Background Image -->
+  <div class="absolute inset-0 z-0">
+    <img
+      src={backgroundImage}
+      alt="Hero background"
+      class="h-full w-full object-cover"
+      loading="eager"
+    />
+    <div
+      class="absolute inset-0"
+      style={`background: linear-gradient(to right, rgba(0,0,0,${overlayOpacity}) 0%, rgba(0,0,0,0.4) 60%, rgba(0,0,0,0.2) 100%);`}
+    ></div>
+  </div>
+
+  <!-- Content Container -->
+  <div class="relative z-10 px-4 py-8 sm:py-10 lg:py-12">
+    <div class="max-w-7xl mx-auto">
+      <div class="grid grid-cols-1 lg:grid-cols-5 gap-8 lg:gap-12 items-center">
+
+        <!-- Hero Content (60% on desktop) -->
+        <div class="lg:col-span-3 text-center lg:text-left">
+          <h1
+            id="dki-headline"
+            class="lp-hero__title text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6"
+            data-dki-template={dkiEnabled ? dkiTemplate : undefined}
+          >
+            {processedTitle}
+          </h1>
+          <p class="lp-hero__subtitle text-xl md:text-2xl text-gray-100 mb-8">
+            {processedSubtitle}
+          </p>
+
+          {benefits.length > 0 && (
+            <div class="lp-hero__benefits space-y-5">
+              {benefits.map((b) => (
+                <div class="flex items-start gap-3 text-left">
+                  <div class="lp-hero__benefit-icon flex-shrink-0" set:html={getIcon(b.icon)} />
+                  <div>
+                    <span class="text-white text-lg font-semibold">{b.title}</span>
+                    <p class="text-gray-200 text-base mt-0.5">{b.description}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <!-- Quote Form (40% on desktop) -->
+        <div class="lg:col-span-2">
+          <QuoteForm
+            formTitle={formTitle}
+            formDescription={formDescription}
+            submitText={submitText}
+            redirectTo={redirectTo}
+            standalone={false}
+            roofTypes={roofTypes}
+            roofHeights={roofHeights}
+            privacyLinkNewTab={true}
+          />
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+{dkiEnabled && (
+  <script is:inline>
+    document.addEventListener('DOMContentLoaded', function() {
+      var params = new URLSearchParams(window.location.search);
+      var st = params.get('st');
+      if (st) {
+        var titleCased = st.replace(/\b\w/g, function(c) { return c.toUpperCase(); });
+        var headline = document.getElementById('dki-headline');
+        if (headline) {
+          var template = headline.getAttribute('data-dki-template');
+          if (template) {
+            headline.textContent = template.replace('{keyword}', titleCased);
+          } else {
+            headline.textContent = 'Professional ' + titleCased + ' Services';
+          }
+        }
+        // Update page title
+        document.title = document.title.replace(/^[^|]+/, titleCased + ' ');
+      }
+    });
+  </script>
+)}
+
+<style>
+  .lp-hero {
+    min-height: 450px;
+  }
+
+  @media (min-width: 768px) {
+    .lp-hero {
+      min-height: 480px;
+    }
+  }
+
+  .lp-hero__title {
+    text-shadow:
+      0 2px 4px rgba(0,0,0,0.3),
+      0 4px 8px rgba(0,0,0,0.15);
+  }
+
+  .lp-hero__subtitle {
+    text-shadow: 0 1px 3px rgba(0,0,0,0.25);
+  }
+
+  .lp-hero__benefit-icon {
+    width: 2rem;
+    height: 2rem;
+    color: var(--color-secondary, #059669);
+    margin-top: 0.125rem;
+  }
+
+  .lp-hero__benefit-icon svg {
+    width: 100%;
+    height: 100%;
+  }
+</style>

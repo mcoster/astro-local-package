@@ -1,0 +1,179 @@
+---
+export interface Props {
+  heading?: string;
+  subtitle?: string;
+  testimonials?: Array<{
+    name: string;
+    location?: string;
+    text: string;
+    rating?: number;
+    service?: string;
+  }>;
+  ctaText?: string;
+  ctaTarget?: string;
+}
+
+import { getIcon } from '../utils/icon-map';
+
+const {
+  heading = 'What Our Customers Say',
+  subtitle,
+  testimonials = [],
+  ctaText,
+  ctaTarget = '#quote-form',
+} = Astro.props;
+
+const starFilled = getIcon('star-filled');
+const starOutline = getIcon('star');
+---
+
+<section class="testimonials">
+  <div class="testimonials__container">
+    <div class="testimonials__header">
+      <h2 class="testimonials__heading">{heading}</h2>
+      {subtitle && (
+        <p class="testimonials__subtitle">{subtitle}</p>
+      )}
+    </div>
+    <div class="testimonials__grid">
+      {testimonials.map((t) => {
+        const rating = t.rating ?? 5;
+        return (
+          <div class="testimonials__card">
+            <div class="testimonials__stars">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <span
+                  class={`testimonials__star ${i < rating ? 'testimonials__star--filled' : ''}`}
+                  set:html={i < rating ? starFilled : starOutline}
+                />
+              ))}
+            </div>
+            <blockquote class="testimonials__text">"{t.text}"</blockquote>
+            <div class="testimonials__author">
+              <span class="testimonials__name">{t.name}</span>
+              {(t.location || t.service) && (
+                <span class="testimonials__meta">
+                  {[t.location, t.service].filter(Boolean).join(' · ')}
+                </span>
+              )}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+    {ctaText && (
+      <div class="testimonials__cta">
+        <a href={ctaTarget} class="btn-cta-primary">
+          {ctaText}
+        </a>
+      </div>
+    )}
+  </div>
+</section>
+
+<style>
+  .testimonials {
+    padding: 3rem 1rem;
+    background: #f9fafb;
+  }
+
+  .testimonials__container {
+    max-width: 72rem;
+    margin: 0 auto;
+  }
+
+  .testimonials__header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+  }
+
+  .testimonials__heading {
+    font-size: 1.875rem;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 0.5rem;
+  }
+
+  @media (min-width: 768px) {
+    .testimonials__heading {
+      font-size: 2.25rem;
+    }
+  }
+
+  .testimonials__subtitle {
+    font-size: 1.1rem;
+    color: #6b7280;
+    max-width: 36rem;
+    margin: 0 auto;
+  }
+
+  .testimonials__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  @media (min-width: 768px) {
+    .testimonials__grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  .testimonials__card {
+    background: white;
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+
+  .testimonials__stars {
+    display: flex;
+    gap: 0.125rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .testimonials__star {
+    width: 1.25rem;
+    height: 1.25rem;
+    color: #d1d5db;
+  }
+
+  .testimonials__star--filled {
+    color: #f59e0b;
+  }
+
+  .testimonials__star svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  .testimonials__text {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: #374151;
+    margin-bottom: 1rem;
+    font-style: italic;
+  }
+
+  .testimonials__author {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+  }
+
+  .testimonials__name {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #111827;
+  }
+
+  .testimonials__meta {
+    font-size: 0.8rem;
+    color: #9ca3af;
+  }
+
+  .testimonials__cta {
+    text-align: center;
+    margin-top: 2.5rem;
+  }
+</style>

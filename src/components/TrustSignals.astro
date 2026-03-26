@@ -1,0 +1,90 @@
+---
+export interface Props {
+  signals?: Array<{ icon: string; title: string; description?: string }>;
+}
+
+import { getIcon } from '../utils/icon-map';
+
+const {
+  signals = [
+    { icon: 'shield-check', title: 'Fully Insured' },
+    { icon: 'check-circle', title: 'Free No-Obligation Quote' },
+    { icon: 'map-pin', title: 'Gold Coast Local' },
+  ],
+} = Astro.props;
+---
+
+<section class="trust-signals">
+  <div class="trust-signals__container">
+    {signals.map((signal) => (
+      <div class="trust-signals__item">
+        <div class="trust-signals__icon" set:html={getIcon(signal.icon)} />
+        <div class="trust-signals__text">
+          <span class="trust-signals__title">{signal.title}</span>
+          {signal.description && (
+            <span class="trust-signals__desc">{signal.description}</span>
+          )}
+        </div>
+      </div>
+    ))}
+  </div>
+</section>
+
+<style>
+  .trust-signals {
+    background: #f9fafb;
+    padding: 2rem 1rem;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  .trust-signals__container {
+    max-width: 80rem;
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+    gap: 3rem;
+    flex-wrap: wrap;
+  }
+
+  .trust-signals__item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .trust-signals__icon {
+    width: 2.25rem;
+    height: 2.25rem;
+    color: var(--color-secondary, #059669);
+    flex-shrink: 0;
+  }
+
+  .trust-signals__icon svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  .trust-signals__text {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .trust-signals__title {
+    font-weight: 600;
+    font-size: 1.05rem;
+    color: #1f2937;
+  }
+
+  .trust-signals__desc {
+    font-size: 0.8rem;
+    color: #6b7280;
+  }
+
+  @media (max-width: 639px) {
+    .trust-signals__container {
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+    }
+  }
+</style>

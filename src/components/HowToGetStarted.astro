@@ -1,0 +1,114 @@
+---
+export interface Props {
+  heading?: string;
+  steps?: Array<{ title: string; description: string }>;
+  ctaText?: string;
+  ctaTarget?: string;
+}
+
+const {
+  heading = 'How to Get Started',
+  steps = [
+    { title: 'Fill Out The Form', description: 'Complete the form on this page to get a no-obligation quote.' },
+    { title: 'Receive A Free Quote', description: 'We will send you a free quote based on your roof details.' },
+    { title: 'Set An Appointment', description: "We'll come and clean at a day and time that suits you." },
+  ],
+  ctaText = 'Get Your Free Quote',
+  ctaTarget = '#quote-form',
+} = Astro.props;
+---
+
+<section class="how-to-start">
+  <div class="how-to-start__container">
+    <h2 class="how-to-start__heading">{heading}</h2>
+    <div class="how-to-start__steps">
+      {steps.map((step, i) => (
+        <div class="how-to-start__step">
+          <div class="how-to-start__number">{i + 1}</div>
+          <h3 class="how-to-start__step-title">{step.title}</h3>
+          <p class="how-to-start__step-desc">{step.description}</p>
+        </div>
+      ))}
+    </div>
+    <div class="how-to-start__cta">
+      <a href={ctaTarget} class="btn-cta-primary">
+        {ctaText}
+      </a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .how-to-start {
+    padding: 3rem 1rem;
+    background: white;
+  }
+
+  .how-to-start__container {
+    max-width: 64rem;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .how-to-start__heading {
+    font-size: 1.875rem;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 2.5rem;
+  }
+
+  .how-to-start__steps {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    margin-bottom: 2.5rem;
+  }
+
+  @media (min-width: 768px) {
+    .how-to-start__steps {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .how-to-start__heading {
+      font-size: 2.25rem;
+    }
+  }
+
+  .how-to-start__step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .how-to-start__number {
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 50%;
+    background: var(--color-primary, #1E40AF);
+    color: white;
+    font-size: 1.5rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .how-to-start__step-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #111827;
+  }
+
+  .how-to-start__step-desc {
+    font-size: 0.9rem;
+    color: #6b7280;
+    line-height: 1.5;
+    max-width: 18rem;
+  }
+
+  .how-to-start__cta {
+    margin-top: 0.5rem;
+  }
+</style>

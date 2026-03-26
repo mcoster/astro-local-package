@@ -24,6 +24,12 @@ import Breadcrumb from '../components/Breadcrumb.astro';
 import MarkdownContent from '../components/MarkdownContent.astro';
 import WhyUs from '../components/WhyUs.astro';
 import Spacer from '../components/Spacer.astro';
+import LandingPageHero from '../components/LandingPageHero.astro';
+import TrustSignals from '../components/TrustSignals.astro';
+import HowToGetStarted from '../components/HowToGetStarted.astro';
+import Testimonials from '../components/Testimonials.astro';
+import LandingPageHeader from '../components/LandingPageHeader.astro';
+import LandingPageFooter from '../components/LandingPageFooter.astro';
 
 /**
  * Registry of all available components
@@ -59,6 +65,14 @@ export const componentRegistry: Record<string, any> = {
   'Breadcrumb': Breadcrumb,
   'WhyUs': WhyUs,
   'Spacer': Spacer,
+
+  // Landing Page Components
+  'LandingPageHero': LandingPageHero,
+  'TrustSignals': TrustSignals,
+  'HowToGetStarted': HowToGetStarted,
+  'Testimonials': Testimonials,
+  'LandingPageHeader': LandingPageHeader,
+  'LandingPageFooter': LandingPageFooter,
 };
 
 /**

@@ -7,6 +7,7 @@ export interface Props {
   standalone?: boolean;
   roofTypes?: string[];
   roofHeights?: string[];
+  privacyLinkNewTab?: boolean;
 }
 
 import { siteConfig } from '../config/site';
@@ -19,6 +20,7 @@ const {
   standalone = true,
   roofTypes = [],
   roofHeights = [],
+  privacyLinkNewTab = false,
 } = Astro.props;
 
 const containerClass = standalone ? 'quote-form-section py-4' : '';
@@ -174,8 +176,12 @@ const placesApiKey = siteConfig.googleMaps.placesApiKey;
       
       <!-- Privacy Notice -->
       <p class="text-xs text-gray-500 text-center">
-        By submitting this form, you agree to our 
-        <a href="/privacy" class="underline hover:text-primary">Privacy Policy</a>.
+        By submitting this form, you agree to our
+        <a
+          href="/privacy"
+          class="underline hover:text-primary"
+          {...(privacyLinkNewTab ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+        >Privacy Policy</a>.
       </p>
     </form>
   </div>

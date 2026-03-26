@@ -1,0 +1,31 @@
+---
+export interface Props {
+  title?: string;
+  description?: string;
+  noindex?: boolean;
+  logo?: string;
+  trustPhrase?: string;
+  footerLinks?: Array<{ label: string; href: string }>;
+}
+
+import Layout from './Layout.astro';
+import LandingPageHeader from '../components/LandingPageHeader.astro';
+import LandingPageFooter from '../components/LandingPageFooter.astro';
+
+const {
+  title,
+  description,
+  noindex = true,
+  logo,
+  trustPhrase,
+  footerLinks,
+} = Astro.props;
+---
+
+<Layout title={title} description={description} noindex={noindex}>
+  <LandingPageHeader logo={logo} trustPhrase={trustPhrase} />
+  <main>
+    <slot />
+  </main>
+  <LandingPageFooter links={footerLinks} />
+</Layout>
