@@ -163,6 +163,18 @@ const localBusinessSchema = {
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
+
+    {siteConfig.googleAds.tagId && (
+      <>
+        <script is:inline src={`https://www.googletagmanager.com/gtag/js?id=${siteConfig.googleAds.tagId}`} async></script>
+        <script is:inline define:vars={{ tagId: siteConfig.googleAds.tagId }}>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', tagId);
+        </script>
+      </>
+    )}
   </head>
   <body>
     <slot />

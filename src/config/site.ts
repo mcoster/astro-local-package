@@ -192,6 +192,12 @@ export const siteConfig = {
     discoveredCache: import.meta.env.GOOGLE_MAPS_DISCOVERED_CACHE || undefined,
   },
   
+  // Google Ads Tracking
+  googleAds: {
+    tagId: getConfigValue('google_ads.tag_id', 'PUBLIC_GOOGLE_ADS_TAG_ID', ''),
+    conversionId: getConfigValue('google_ads.conversion_id', 'PUBLIC_GOOGLE_ADS_CONVERSION_ID', ''),
+  },
+
   // Theme Colors (with # prefix added)
   colors: {
     primary: `#${getConfigValue('colors.primary', 'PUBLIC_COLOR_PRIMARY', '3B82F6')}`,
