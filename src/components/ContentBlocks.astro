@@ -74,11 +74,13 @@ const processedBlocks = blocks.map((block, index) => {
             </div>
             {block.image && (
               <div class="content-block__image-wrapper">
-                <img 
-                  src={block.image} 
+                <img
+                  src={block.image}
                   alt={getAltText(block.imageAlt, block.image, 'Content image')}
                   class="content-block__image"
                   loading="lazy"
+                  width="800"
+                  height="600"
                 />
               </div>
             )}

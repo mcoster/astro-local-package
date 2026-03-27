@@ -50,7 +50,7 @@ const altText = getAltText(undefined, image, title);
                 quality={80}
               />
             ) : (
-              <img src={image} alt={altText} loading="lazy" />
+              <img src={image} alt={altText} loading="lazy" width="800" height="600" />
             )}
           </div>
         ) : icon ? (
@@ -80,7 +80,7 @@ const altText = getAltText(undefined, image, title);
               quality={80}
             />
           ) : (
-            <img src={image} alt={title} loading="lazy" />
+            <img src={image} alt={title} loading="lazy" width="800" height="600" />
           )}
         </div>
       ) : icon ? (
