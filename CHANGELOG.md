@@ -5,6 +5,19 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.63] - 2026-05-20
+
+### Added
+- `QuoteForm` now ships a hidden `service` input on submission when the site
+  opts in via `business.form_service_tag` in `business.yaml`. The value is
+  passed through to Netlify's form payload and is available to downstream
+  CRM workflows that key off lead vertical. Default is empty (opt-in only —
+  no behavioural change for sites that don't set the YAML key).
+- New `siteConfig.formServiceTag` (sourced from `business.form_service_tag`
+  or `PUBLIC_FORM_SERVICE_TAG` env var).
+- `BusinessConfig.business.form_service_tag?: string` added to the exported
+  type for type-safe site authoring.
+
 ## [1.0.29] - 2025-09-14
 
 ### Added

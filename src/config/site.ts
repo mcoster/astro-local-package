@@ -51,6 +51,7 @@ interface BusinessConfig {
     owner_name?: string;
     broad_region?: string;
     form_location?: string;
+    form_service_tag?: string;
   };
   address: Address;
   service: {
@@ -146,6 +147,7 @@ export const siteConfig = {
   ownerName: getConfigValue('business.owner_name', 'PUBLIC_OWNER_NAME', undefined),
   broadRegion: getConfigValue('business.broad_region', 'PUBLIC_BROAD_REGION', undefined),
   formLocation: getConfigValue('business.form_location', 'PUBLIC_FORM_LOCATION', undefined),
+  formServiceTag: getConfigValue('business.form_service_tag', 'PUBLIC_FORM_SERVICE_TAG', ''),
   mainLocation: getConfigValue('service.main_location', 'PUBLIC_MAIN_LOCATION', 'Your City'),
   mainServiceCategory: getConfigValue('service.main_category', 'PUBLIC_MAIN_SERVICE_CATEGORY', 'Professional'),
   

@@ -23,6 +23,7 @@ export interface BusinessConfig {
     owner_name: string;
     broad_region: string;
     form_location: string;
+    form_service_tag?: string;
   };
   address: {
     street: string;

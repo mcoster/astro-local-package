@@ -65,11 +65,22 @@ const placesApiKey = siteConfig.googleMaps.placesApiKey;
     >
       <!-- Netlify Forms hidden inputs -->
       <input type="hidden" name="form-name" value="quote-form" />
-      
+
+      <!-- Service vertical (hidden) — used by downstream CRM workflows to
+           identify the lead's service category. Opt-in per site via
+           business.yaml `business.form_service_tag`. -->
+      {siteConfig.formServiceTag && (
+        <input
+          type="hidden"
+          name="service"
+          value={siteConfig.formServiceTag}
+        />
+      )}
+
       <!-- Honeypot field for spam protection (hidden) -->
       <div class="hidden">
         <label>
-          Don't fill this out if you're human: 
+          Don't fill this out if you're human:
           <input name="bot-field" />
         </label>
       </div>
