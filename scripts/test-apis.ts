@@ -37,7 +37,7 @@ async function testOpenAI() {
   logSection('Testing OpenAI Vision API');
   
   const apiKey = process.env.OPENAI_API_KEY;
-  const model = process.env.VISION_MODEL_OPENAI || 'gpt-5';
+  const model = process.env.VISION_MODEL_OPENAI || 'gpt-5.5';
   
   if (!apiKey) {
     log('✗ OpenAI API key not configured', colors.red);
