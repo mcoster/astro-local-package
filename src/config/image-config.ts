@@ -103,7 +103,7 @@ export const defaultImageConfig: ImageConfig = {
         anthropic: process.env.ANTHROPIC_API_KEY
       },
       models: {
-        openai: process.env.VISION_MODEL_OPENAI || 'gpt-4-vision-preview',
+        openai: process.env.VISION_MODEL_OPENAI || 'gpt-4o',
         anthropic: process.env.VISION_MODEL_ANTHROPIC || 'claude-3-opus-20240229'
       }
     },
