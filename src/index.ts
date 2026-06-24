@@ -7,6 +7,8 @@ export * from './utils/spintax';
 export * from './utils/locations';
 export * from './utils/image-registry';
 export * from './utils/google-places';
+export * from './utils/schema';
+export * from './content/cost/schema';
 
 // Component registry exports
 export * from './utils/component-registry';

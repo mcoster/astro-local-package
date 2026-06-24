@@ -20,6 +20,8 @@ import ServiceContent from '../components/ServiceContent.astro';
 import RelatedServices from '../components/RelatedServices.astro';
 import ServiceFeatures from '../components/ServiceFeatures.astro';
 import ServiceFAQ from '../components/ServiceFAQ.astro';
+import AnswerBlock from '../components/AnswerBlock.astro';
+import CostRangeTable from '../components/CostRangeTable.astro';
 import Breadcrumb from '../components/Breadcrumb.astro';
 import MarkdownContent from '../components/MarkdownContent.astro';
 import WhyUs from '../components/WhyUs.astro';
@@ -45,6 +47,8 @@ export const componentRegistry: Record<string, any> = {
   'IconGrid': IconGrid,
   'ServicesGrid': ServicesGrid,
   'MarkdownContent': MarkdownContent,
+  'AnswerBlock': AnswerBlock,
+  'CostRangeTable': CostRangeTable,
   
   // Service-specific Components
   'ServiceContent': ServiceContent,

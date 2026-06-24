@@ -1,0 +1,60 @@
+---
+import Layout from '@package/layouts/Layout.astro';
+import ContentBlocks from '@package/components/ContentBlocks.astro';
+import ServiceFAQ from '@package/components/ServiceFAQ.astro';
+import CostRangeTable from '@package/components/CostRangeTable.astro';
+import { COST_ESTIMATE_DISCLAIMER } from '@package/content/cost/schema';
+import { faqEntriesFromAnswerBlocks } from '@package/utils/schema';
+
+const answerBlocks = [
+  {
+    type: 'answer',
+    question: 'How much does roof cleaning cost?',
+    shortAnswer: 'Most residential roof cleaning jobs cost between $450 and $900.',
+    detail: 'The final quote depends on roof height, access, roof material, staining, and safety requirements.',
+    cta: {
+      text: 'Call for a quote',
+      href: 'tel:0755551234',
+    },
+  },
+];
+
+const serviceFaqs = [
+  {
+    question: 'How much does roof cleaning cost?',
+    answer: 'This duplicate FAQ should be deduped against the answer block.',
+  },
+  {
+    question: 'Do you provide on-site quotes?',
+    answer: 'Yes. Final pricing depends on an on-site assessment.',
+  },
+];
+
+const ranges = [
+  {
+    label: 'Single-storey tile roof',
+    min: 450,
+    max: 900,
+    unit: 'job',
+    currency: 'AUD',
+    notes: 'Typical residential range before on-site assessment.',
+  },
+];
+
+const faqs = [
+  ...faqEntriesFromAnswerBlocks(answerBlocks),
+  ...serviceFaqs,
+];
+---
+
+<Layout
+  title="Roof Cleaning Cost"
+  description="Roof cleaning cost ranges for Gold Coast homes."
+  faqs={faqs}
+>
+  <main>
+    <ContentBlocks blocks={answerBlocks} alternateBackground={false} />
+    <CostRangeTable ranges={ranges} disclaimer={COST_ESTIMATE_DISCLAIMER} />
+    <ServiceFAQ faqs={serviceFaqs} />
+  </main>
+</Layout>

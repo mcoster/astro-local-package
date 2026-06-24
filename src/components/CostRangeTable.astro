@@ -1,0 +1,84 @@
+---
+import {
+  COST_ESTIMATE_DISCLAIMER,
+  type CostRange,
+} from '../content/cost/schema';
+
+export interface Props {
+  ranges: CostRange[];
+  caption?: string;
+  disclaimer?: string;
+  className?: string;
+}
+
+const {
+  ranges,
+  caption = 'Estimated cost ranges',
+  disclaimer = COST_ESTIMATE_DISCLAIMER,
+  className = '',
+} = Astro.props;
+
+function formatMoney(value: number, currency = 'AUD') {
+  return new Intl.NumberFormat('en-AU', {
+    style: 'currency',
+    currency,
+    maximumFractionDigits: 0,
+  }).format(value);
+}
+---
+
+<div class={`cost-range-table ${className}`}>
+  <table>
+    <caption>{caption}</caption>
+    <thead>
+      <tr>
+        <th scope="col">Scope</th>
+        <th scope="col">Estimate range</th>
+        <th scope="col">Notes</th>
+      </tr>
+    </thead>
+    <tbody>
+      {ranges.map((range) => (
+        <tr>
+          <th scope="row">{range.label}</th>
+          <td>{formatMoney(range.min, range.currency)} - {formatMoney(range.max, range.currency)} / {range.unit}</td>
+          <td>{range.notes || 'Depends on site conditions and assessment.'}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+  <p class="cost-range-table__disclaimer">{disclaimer}</p>
+</div>
+
+<style>
+  @reference "tailwindcss";
+
+  .cost-range-table {
+    @apply my-8 overflow-x-auto;
+  }
+
+  .cost-range-table table {
+    @apply w-full border-collapse bg-white text-left text-gray-700;
+  }
+
+  .cost-range-table caption {
+    @apply text-left text-sm font-semibold uppercase tracking-wide text-gray-500 mb-3;
+  }
+
+  .cost-range-table th,
+  .cost-range-table td {
+    @apply border-b border-gray-200 p-4 align-top;
+  }
+
+  .cost-range-table thead th {
+    @apply bg-gray-50 text-sm font-semibold text-gray-900;
+  }
+
+  .cost-range-table tbody th {
+    @apply font-semibold text-gray-900;
+  }
+
+  .cost-range-table__disclaimer {
+    @apply mt-4 text-sm leading-6 text-gray-600;
+  }
+</style>
