@@ -1,0 +1,36 @@
+business:
+  name: Gold Coast Roof Care
+  tagline: Roof cleaning for Gold Coast homes
+  phone: 07 5555 1234
+  email: quotes@goldcoastroofcare.example
+address:
+  street: 12 Marine Parade
+  city: Southport
+  state: QLD
+  postcode: "4215"
+  country: Australia
+service:
+  main_category: Roof Cleaning
+  main_location: Gold Coast
+  radius_km: 40
+  max_location_pages: 25
+  center_lat: -28.0167
+  center_lng: 153.4
+colors:
+  primary: 0F766E
+  secondary: 2563EB
+  accent: F59E0B
+  cta: DC2626
+hours:
+  monday: 8:00 AM - 5:00 PM
+  tuesday: 8:00 AM - 5:00 PM
+  wednesday: 8:00 AM - 5:00 PM
+  thursday: 8:00 AM - 5:00 PM
+  friday: 8:00 AM - 5:00 PM
+  saturday: Closed
+  sunday: Closed
+social: {}
+website:
+  url: https://roof.example.com
+google_maps: {}
+footer: {}

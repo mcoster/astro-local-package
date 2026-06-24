@@ -1,5 +1,11 @@
 ---
 import { siteConfig } from '../config/site';
+import {
+  buildPageSchema,
+  type FAQEntry,
+  type JsonLdGraph,
+  type JsonLdNode,
+} from '../utils/schema';
 import '@/styles/global.css';
 
 export interface Props {
@@ -7,6 +13,10 @@ export interface Props {
   description?: string;
   image?: string;
   noindex?: boolean;
+  schema?: JsonLdNode | JsonLdNode[] | JsonLdGraph | null;
+  schemaItems?: JsonLdNode | JsonLdNode[] | JsonLdGraph | null;
+  faqs?: FAQEntry[];
+  includeLocalBusiness?: boolean;
 }
 
 const {
@@ -14,106 +24,24 @@ const {
   description = siteConfig.tagline,
   image = '/og-image.jpg',
   noindex = false,
+  schema,
+  schemaItems,
+  faqs = [],
+  includeLocalBusiness = true,
 } = Astro.props;
 
 const pageTitle = title === siteConfig.businessName ? title : `${title} | ${siteConfig.businessName}`;
 const canonicalURL = new URL(Astro.url.pathname, siteConfig.siteUrl);
-
-// Helper function to parse hours string
-const parseHours = (hoursString: string) => {
-  if (hoursString === 'Closed') return null;
-  const [open, close] = hoursString.split(' - ');
-  return { opens: open, closes: close };
-};
-
-// Generate OpeningHoursSpecification
-const openingHoursSpecification = [
-  { day: 'Monday', hours: siteConfig.hours.monday },
-  { day: 'Tuesday', hours: siteConfig.hours.tuesday },
-  { day: 'Wednesday', hours: siteConfig.hours.wednesday },
-  { day: 'Thursday', hours: siteConfig.hours.thursday },
-  { day: 'Friday', hours: siteConfig.hours.friday },
-  { day: 'Saturday', hours: siteConfig.hours.saturday },
-  { day: 'Sunday', hours: siteConfig.hours.sunday }
-].map(({ day, hours }) => {
-  const parsed = parseHours(hours);
-  return parsed ? {
-    "@type": "OpeningHoursSpecification",
-    "dayOfWeek": day,
-    "opens": parsed.opens,
-    "closes": parsed.closes
-  } : null;
-}).filter(Boolean);
-
-// Local Business Schema for SEO with enhanced features
-const localBusinessSchema = {
-  "@context": "https://schema.org",
-  "@type": "LocalBusiness",
-  "name": siteConfig.businessName,
-  "description": siteConfig.tagline,
-  "url": siteConfig.siteUrl,
-  "telephone": siteConfig.phone,
-  "email": siteConfig.email,
-  "image": new URL('/og-image.jpg', siteConfig.siteUrl).href,
-  "logo": new URL('/logo.png', siteConfig.siteUrl).href,
-  "address": {
-    "@type": "PostalAddress",
-    "streetAddress": siteConfig.address.street,
-    "addressLocality": siteConfig.address.city,
-    "addressRegion": siteConfig.address.state,
-    "postalCode": siteConfig.address.postcode,
-    "addressCountry": siteConfig.address.country
-  },
-  "openingHoursSpecification": openingHoursSpecification,
-  "areaServed": [
-    // GeoCircle for primary service area
-    {
-      "@type": "GeoCircle",
-      "geoMidpoint": {
-        "@type": "GeoCoordinates",
-        "latitude": siteConfig.locationPages.centerLat || -34.9285, // Use config or default to Australia center
-        "longitude": siteConfig.locationPages.centerLng || 138.6007
-      },
-      "geoRadius": (siteConfig.locationPages.serviceRadiusKm * 1000).toString() // Convert km to meters
-    },
-    // Individual cities/suburbs
-    {
-      "@type": "City",
-      "name": siteConfig.mainLocation
-    }
-  ],
-  "priceRange": "$$",
-  "paymentAccepted": ["Cash", "Credit Card", "Debit Card", "Bank Transfer"],
-  "currenciesAccepted": "AUD",
-  "amenityFeature": [
-    {
-      "@type": "LocationFeatureSpecification",
-      "name": "Free Quotes",
-      "value": true
-    },
-    {
-      "@type": "LocationFeatureSpecification", 
-      "name": "Emergency Service",
-      "value": true
-    }
-  ],
-  "potentialAction": {
-    "@type": "ReserveAction",
-    "target": {
-      "@type": "EntryPoint",
-      "urlTemplate": siteConfig.siteUrl + "/contact",
-      "inLanguage": "en-US",
-      "actionPlatform": [
-        "http://schema.org/DesktopWebPlatform",
-        "http://schema.org/MobileWebPlatform"
-      ]
-    },
-    "result": {
-      "@type": "Reservation",
-      "name": "Request a Quote"
-    }
-  }
-};
+const pageSchema = buildPageSchema({
+  siteConfig,
+  pageUrl: canonicalURL.href,
+  schema,
+  schemaItems,
+  faqs,
+  includeLocalBusiness,
+});
+const hasPageSchema = pageSchema['@graph'].length > 0;
+const pageSchemaJson = JSON.stringify(pageSchema);
 ---
 
 <!doctype html>
@@ -151,8 +79,9 @@ const localBusinessSchema = {
     <!-- Theme Colors -->
     <meta name="theme-color" content={siteConfig.colors.primary} />
     
-    <!-- Local Business Schema -->
-    <script type="application/ld+json" is:inline set:html={JSON.stringify(localBusinessSchema)} />
+    {hasPageSchema && (
+      <script type="application/ld+json" is:inline set:html={pageSchemaJson} />
+    )}
     
     <!-- Preconnect to external domains -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />

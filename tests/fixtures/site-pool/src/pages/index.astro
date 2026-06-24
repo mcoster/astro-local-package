@@ -1,0 +1,56 @@
+---
+import Layout from '@package/layouts/Layout.astro';
+import ContentBlocks from '@package/components/ContentBlocks.astro';
+import ServiceFAQ from '@package/components/ServiceFAQ.astro';
+import CostRangeTable from '@package/components/CostRangeTable.astro';
+import { COST_ESTIMATE_DISCLAIMER } from '@package/content/cost/schema';
+import { faqEntriesFromAnswerBlocks } from '@package/utils/schema';
+
+const answerBlocks = [
+  {
+    type: 'answer',
+    question: 'How much does pool cleaning cost?',
+    shortAnswer: 'Most regular pool cleaning visits cost between $90 and $180.',
+    detail: 'The final quote depends on pool size, access, debris load, water condition, and visit frequency.',
+  },
+];
+
+const serviceFaqs = [
+  {
+    question: 'How much does pool cleaning cost?',
+    answer: 'This duplicate FAQ should be deduped against the answer block.',
+  },
+  {
+    question: 'Do you quote before starting?',
+    answer: 'Yes. Final pricing depends on an on-site assessment.',
+  },
+];
+
+const ranges = [
+  {
+    label: 'Standard residential pool visit',
+    min: 90,
+    max: 180,
+    unit: 'visit',
+    currency: 'AUD',
+    notes: 'Typical range before on-site assessment.',
+  },
+];
+
+const faqs = [
+  ...faqEntriesFromAnswerBlocks(answerBlocks),
+  ...serviceFaqs,
+];
+---
+
+<Layout
+  title="Pool Cleaning Cost"
+  description="Pool cleaning cost ranges for Gold Coast homes."
+  faqs={faqs}
+>
+  <main>
+    <ContentBlocks blocks={answerBlocks} alternateBackground={false} />
+    <CostRangeTable ranges={ranges} disclaimer={COST_ESTIMATE_DISCLAIMER} />
+    <ServiceFAQ faqs={serviceFaqs} />
+  </main>
+</Layout>

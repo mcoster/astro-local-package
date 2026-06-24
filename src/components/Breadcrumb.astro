@@ -11,18 +11,6 @@ export interface Props {
 }
 
 const { items, className = '' } = Astro.props;
-
-// Generate breadcrumb schema for SEO
-const breadcrumbSchema = {
-  "@context": "https://schema.org",
-  "@type": "BreadcrumbList",
-  "itemListElement": items.map((item, index) => ({
-    "@type": "ListItem",
-    "position": index + 1,
-    "name": item.label,
-    ...(item.href && !item.current ? { "item": new URL(item.href, Astro.url).href } : {})
-  }))
-};
 ---
 
 <nav aria-label="Breadcrumb" class={`breadcrumb ${className}`}>
@@ -58,9 +46,6 @@ const breadcrumbSchema = {
     ))}
   </ol>
 </nav>
-
-<!-- Breadcrumb Schema -->
-<script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
 
 <style>
   .breadcrumb {

@@ -6,6 +6,10 @@ export interface Props {
   logo?: string;
   trustPhrase?: string;
   footerLinks?: Array<{ label: string; href: string }>;
+  schema?: any;
+  schemaItems?: any;
+  faqs?: Array<{ question: string; answer: string }>;
+  includeLocalBusiness?: boolean;
 }
 
 import Layout from './Layout.astro';
@@ -19,10 +23,22 @@ const {
   logo,
   trustPhrase,
   footerLinks,
+  schema,
+  schemaItems,
+  faqs,
+  includeLocalBusiness,
 } = Astro.props;
 ---
 
-<Layout title={title} description={description} noindex={noindex}>
+<Layout
+  title={title}
+  description={description}
+  noindex={noindex}
+  schema={schema}
+  schemaItems={schemaItems}
+  faqs={faqs}
+  includeLocalBusiness={includeLocalBusiness}
+>
   <LandingPageHeader logo={logo} trustPhrase={trustPhrase} />
   <main>
     <slot />

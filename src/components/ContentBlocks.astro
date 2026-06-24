@@ -1,20 +1,42 @@
 ---
 import { marked } from 'marked';
 import { getAltText } from '../utils/image-alt-generator';
+import AnswerBlock from './AnswerBlock.astro';
 
-export interface ContentBlock {
+interface ContentBlockBase {
+  background?: 'white' | 'gray' | 'primary' | 'gradient';
+  variant?: 'default' | 'compact' | 'expanded';
+}
+
+export interface StandardContentBlock extends ContentBlockBase {
+  type?: 'content';
   heading?: string;
   content: string;
   image?: string;
   imageAlt?: string;
   imagePosition?: 'left' | 'right';
-  background?: 'white' | 'gray' | 'primary' | 'gradient';
-  variant?: 'default' | 'compact' | 'expanded';
   cta?: {
     text: string;
     href: string;
   };
 }
+
+export interface AnswerContentBlock extends ContentBlockBase {
+  type: 'answer';
+  question: string;
+  shortAnswer: string;
+  detail?: string;
+  cta?: {
+    text: string;
+    href: string;
+  };
+  interlink?: {
+    text: string;
+    href: string;
+  };
+}
+
+export type ContentBlock = StandardContentBlock | AnswerContentBlock;
 
 export interface Props {
   blocks: ContentBlock[];
@@ -37,17 +59,36 @@ const headingClass = headingLevel === 'h3'
 
 // Process blocks with alternating backgrounds if enabled
 const processedBlocks = blocks.map((block, index) => {
-  if (!block.background && alternateBackground) {
+  const processedBlock = { ...block };
+  if (!processedBlock.background && alternateBackground) {
     const backgrounds = ['white', 'gray'];
     const startIndex = defaultBackground === 'gray' ? 1 : 0;
-    block.background = backgrounds[(startIndex + index) % 2] as 'white' | 'gray';
+    processedBlock.background = backgrounds[(startIndex + index) % 2] as 'white' | 'gray';
   }
-  return block;
+  return processedBlock;
 });
 ---
 
 <div class="content-blocks">
   {processedBlocks.map((block, index) => {
+    if (block.type === 'answer') {
+      return (
+        <section
+          class={`content-block content-block--bg-${block.background || 'white'} content-block--${block.variant || 'default'}`}
+        >
+          <div class="content-block__container">
+            <AnswerBlock
+              question={block.question}
+              shortAnswer={block.shortAnswer}
+              detail={block.detail}
+              cta={block.cta}
+              interlink={block.interlink}
+            />
+          </div>
+        </section>
+      );
+    }
+
     // Convert markdown content to HTML
     const htmlContent = marked.parse(block.content || '');
     

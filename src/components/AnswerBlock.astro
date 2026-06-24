@@ -1,0 +1,106 @@
+---
+import { marked } from 'marked';
+
+export interface Props {
+  question: string;
+  shortAnswer: string;
+  detail?: string;
+  cta?: {
+    text: string;
+    href: string;
+  };
+  interlink?: {
+    text: string;
+    href: string;
+  };
+  id?: string;
+  className?: string;
+}
+
+const {
+  question,
+  shortAnswer,
+  detail = '',
+  cta,
+  interlink,
+  id,
+  className = '',
+} = Astro.props;
+
+const detailHtml = detail ? marked.parse(detail) : '';
+---
+
+<article class={`answer-block ${className}`}>
+  <h2 id={id}>{question}</h2>
+  <p class="answer-block__lead">{shortAnswer}</p>
+
+  {detailHtml && (
+    <div class="answer-block__detail prose prose-lg max-w-none" set:html={detailHtml} />
+  )}
+
+  {(cta || interlink) && (
+    <div class="answer-block__links">
+      {cta && (
+        <a class="answer-block__cta" href={cta.href}>{cta.text}</a>
+      )}
+      {interlink && (
+        <a class="answer-block__interlink" href={interlink.href}>{interlink.text}</a>
+      )}
+    </div>
+  )}
+</article>
+
+<style>
+  @reference "tailwindcss";
+
+  .answer-block {
+    max-width: 56rem;
+  }
+
+  .answer-block h2 {
+    @apply text-3xl md:text-4xl font-bold text-gray-900 mb-4;
+  }
+
+  .answer-block__lead {
+    @apply text-xl leading-8 text-gray-800 font-medium mb-6;
+  }
+
+  .answer-block__detail {
+    @apply text-gray-600;
+  }
+
+  .answer-block__detail :global(p) {
+    @apply mb-4;
+  }
+
+  .answer-block__detail :global(ul),
+  .answer-block__detail :global(ol) {
+    @apply my-4 pl-6;
+  }
+
+  .answer-block__detail :global(li) {
+    @apply mb-2;
+  }
+
+  .answer-block__links {
+    @apply flex flex-wrap gap-4 mt-8;
+  }
+
+  .answer-block__cta {
+    @apply inline-flex items-center justify-center rounded-md px-5 py-3 font-semibold text-white no-underline;
+    background: var(--color-primary, #3b82f6);
+  }
+
+  .answer-block__cta:hover {
+    background: var(--color-primary-dark, #2563eb);
+  }
+
+  .answer-block__interlink {
+    @apply inline-flex items-center justify-center font-semibold no-underline;
+    color: var(--color-primary, #3b82f6);
+  }
+
+  .answer-block__interlink:hover {
+    text-decoration: underline;
+  }
+</style>

@@ -1,5 +1,11 @@
 ---
 import { siteConfig } from '../config/site';
+import {
+  buildPageSchema,
+  type FAQEntry,
+  type JsonLdGraph,
+  type JsonLdNode,
+} from '../utils/schema';
 
 export interface Props {
   title?: string;
@@ -20,7 +26,10 @@ export interface Props {
     currency?: string;
     availability?: 'in stock' | 'out of stock' | 'preorder';
   };
-  schema?: any;
+  schema?: JsonLdNode | JsonLdNode[] | JsonLdGraph | null;
+  schemaItems?: JsonLdNode | JsonLdNode[] | JsonLdGraph | null;
+  faqs?: FAQEntry[];
+  includeLocalBusiness?: boolean;
 }
 
 const {
@@ -32,7 +41,10 @@ const {
   type = 'website',
   article,
   product,
-  schema
+  schema,
+  schemaItems,
+  faqs = [],
+  includeLocalBusiness = false
 } = Astro.props;
 
 // Generate page title
@@ -56,6 +68,17 @@ const metaDescription = description ||
 const truncatedDescription = metaDescription.length > 160 
   ? metaDescription.substring(0, 157) + '...'
   : metaDescription;
+
+const pageSchema = buildPageSchema({
+  siteConfig,
+  pageUrl: canonicalURL.href,
+  schema,
+  schemaItems,
+  faqs,
+  includeLocalBusiness,
+});
+const hasPageSchema = pageSchema['@graph'].length > 0;
+const pageSchemaJson = JSON.stringify(pageSchema);
 ---
 
 <!-- Primary Meta Tags -->
@@ -127,7 +150,6 @@ const truncatedDescription = metaDescription.length > 160
 <meta name="geo.position" content="latitude;longitude" />
 <meta name="ICBM" content="latitude, longitude" />
 
-<!-- Custom Schema -->
-{schema && (
-  <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+{hasPageSchema && (
+  <script type="application/ld+json" set:html={pageSchemaJson} />
 )}

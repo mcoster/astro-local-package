@@ -10,6 +10,7 @@
     "./components/*": "./src/components/*",
     "./layouts/*": "./src/layouts/*",
     "./utils/*": "./src/utils/*",
+    "./content/*": "./src/content/*",
     "./styles/*": "./src/styles/*",
     "./scripts/*": "./scripts/*"
   },
@@ -23,7 +24,7 @@
     "build": "echo 'Astro components do not need compilation'",
     "dev": "echo 'Watching for changes...'",
     "prepublishOnly": "echo 'Ready to publish'",
-    "test": "echo \"No tests yet\""
+    "test": "node --test tests/*.test.mjs"
   },
   "peerDependencies": {
     "@astrojs/sitemap": "^3.0.0",
