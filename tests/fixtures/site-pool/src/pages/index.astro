@@ -4,11 +4,16 @@ import ContentBlocks from '@package/components/ContentBlocks.astro';
 import ServiceFAQ from '@package/components/ServiceFAQ.astro';
 import CostRangeTable from '@package/components/CostRangeTable.astro';
 import Hero from '@package/components/Hero.astro';
+import Header from '@package/components/Header.astro';
+import Footer from '@package/components/Footer.astro';
+import HeroWithForm from '@package/components/HeroWithForm.astro';
+import BusinessHours from '@package/components/BusinessHours.astro';
 import FloatingCTA from '@package/components/FloatingCTA.astro';
 import ContactInfo from '@package/components/ContactInfo.astro';
 import MapEmbed from '@package/components/MapEmbed.astro';
 import { COST_ESTIMATE_DISCLAIMER } from '@package/content/cost/schema';
 import { faqEntriesFromAnswerBlocks } from '@package/utils/schema';
+import { getMapEmbedConfig } from '@package/utils/google-places';
 import { siteConfig } from '@package/config/site';
 
 const answerBlocks = [
@@ -46,6 +51,8 @@ const faqs = [
   ...faqEntriesFromAnswerBlocks(answerBlocks),
   ...serviceFaqs,
 ];
+
+const mapConfig = await getMapEmbedConfig();
 ---
 
 <Layout
@@ -53,9 +60,25 @@ const faqs = [
   description="Pool cleaning cost ranges for Gold Coast homes."
   faqs={faqs}
 >
+  <span hidden data-fixture-marker="header-start"></span>
+  <Header />
+  <span hidden data-fixture-marker="header-end"></span>
   <main>
+    <span hidden data-fixture-marker="hero-start"></span>
     <Hero backgroundImage="" />
+    <span hidden data-fixture-marker="hero-end"></span>
+    <span hidden data-fixture-marker="custom-hero-start"></span>
+    <Hero backgroundImage="" ctaText="Book a Pool Clean" ctaHref="/book" />
+    <span hidden data-fixture-marker="custom-hero-end"></span>
+    <span hidden data-fixture-marker="hero-with-form-start"></span>
+    <HeroWithForm backgroundImage="" />
+    <span hidden data-fixture-marker="hero-with-form-end"></span>
+    <span hidden data-fixture-marker="business-hours-start"></span>
+    <BusinessHours />
+    <span hidden data-fixture-marker="business-hours-end"></span>
+    <span hidden data-fixture-marker="floating-cta-start"></span>
     <FloatingCTA phoneNumber={siteConfig.phone} showOnScroll={false} />
+    <span hidden data-fixture-marker="floating-cta-end"></span>
     <ContactInfo
       phone={siteConfig.phone}
       email={siteConfig.email}
@@ -65,5 +88,9 @@ const faqs = [
     <ContentBlocks blocks={answerBlocks} alternateBackground={false} />
     <CostRangeTable ranges={ranges} disclaimer={COST_ESTIMATE_DISCLAIMER} />
     <ServiceFAQ faqs={serviceFaqs} />
+    <p id="fixture-map-config-type">{mapConfig.type}</p>
   </main>
+  <span hidden data-fixture-marker="footer-start"></span>
+  <Footer />
+  <span hidden data-fixture-marker="footer-end"></span>
 </Layout>
