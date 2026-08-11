@@ -28,6 +28,12 @@ const legalLinks = [
   { label: 'Terms of Use', href: '/terms', title: 'View our terms of use' },
   { label: 'Disclaimer', href: '/disclaimer', title: 'View our disclaimer' },
 ];
+
+const footerHours = [
+  { label: 'Mon-Fri', value: siteConfig.hours.monday },
+  { label: 'Saturday', value: siteConfig.hours.saturday },
+  { label: 'Sunday', value: siteConfig.hours.sunday },
+].filter(({ value }) => value);
 ---
 
 <footer class="bg-gray-900 text-gray-300">
@@ -38,34 +44,28 @@ const legalLinks = [
         <h3 class="text-white text-lg font-bold mb-4">{siteConfig.businessName}</h3>
         <p class="text-sm mb-4">{siteConfig.tagline}</p>
         <div class="space-y-2 text-sm">
-          <p>{siteConfig.fullAddress}</p>
-          <p>
+          {siteConfig.fullAddress && <p>{siteConfig.fullAddress}</p>}
+          {siteConfig.formattedPhone && <p>
             <a href={`tel:${siteConfig.formattedPhone}`} title={`Call ${siteConfig.businessName}`} class="hover:text-white transition-colors">
               {siteConfig.phone}
             </a>
-          </p>
-          <p class="text-gray-300 break-all">
+          </p>}
+          {siteConfig.email && <p class="text-gray-300 break-all">
             <a href={`mailto:${siteConfig.email}`} title={`Email ${siteConfig.businessName}`} class="hover:text-white transition-colors">
               {siteConfig.email}
             </a>
-          </p>
+          </p>}
         </div>
         
         <!-- Business Hours -->
-        <div class="mt-6">
+        {footerHours.length > 0 && <div class="mt-6">
           <h4 class="text-white text-base font-semibold mb-3">Business Hours</h4>
           <dl class="space-y-1 text-sm">
-            <div>
-              <span class="font-medium">Mon-Fri:</span> {siteConfig.hours.monday}
-            </div>
-            <div>
-              <span class="font-medium">Saturday:</span> {siteConfig.hours.saturday}
-            </div>
-            <div>
-              <span class="font-medium">Sunday:</span> {siteConfig.hours.sunday}
-            </div>
+            {footerHours.map(({ label, value }) => <div>
+              <span class="font-medium">{label}:</span> {value}
+            </div>)}
           </dl>
-        </div>
+        </div>}
         
         <!-- Social Links -->
         {(siteConfig.social.facebook || siteConfig.social.instagram || siteConfig.social.linkedin || siteConfig.social.youtube) && (

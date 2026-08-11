@@ -74,14 +74,14 @@ const processedSubtitle = processor.processString(subtitle);
           </p>
           
           <!-- Mobile CTA - hidden on desktop -->
-          <div class="lg:hidden mb-8">
+          {siteConfig.formattedPhone && <div class="lg:hidden mb-8">
             <a
               href={`tel:${siteConfig.formattedPhone}`}
               class="inline-flex items-center justify-center btn-cta-primary"
             >
               Call {siteConfig.phone}
             </a>
-          </div>
+          </div>}
         </div>
         
         <!-- Quote Form (40% on desktop) -->
