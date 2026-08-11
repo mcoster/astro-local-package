@@ -142,8 +142,8 @@ export const siteConfig = {
   businessName: getConfigValue('business.name', 'PUBLIC_BUSINESS_NAME', 'Your Business Name'),
   businessLogo: getConfigValue('business.logo', 'PUBLIC_BUSINESS_LOGO', undefined),
   tagline: getConfigValue('business.tagline', 'PUBLIC_BUSINESS_TAGLINE', 'Professional Services'),
-  phone: getConfigValue('business.phone', 'PUBLIC_PHONE', '(00) 0000 0000'),
-  email: getConfigValue('business.email', 'PUBLIC_EMAIL', 'info@example.com'),
+  phone: getConfigValue('business.phone', 'PUBLIC_PHONE', ''),
+  email: getConfigValue('business.email', 'PUBLIC_EMAIL', ''),
   ownerName: getConfigValue('business.owner_name', 'PUBLIC_OWNER_NAME', undefined),
   broadRegion: getConfigValue('business.broad_region', 'PUBLIC_BROAD_REGION', undefined),
   formLocation: getConfigValue('business.form_location', 'PUBLIC_FORM_LOCATION', undefined),
@@ -153,23 +153,23 @@ export const siteConfig = {
   
   // Address
   address: {
-    street: getConfigValue('address.street', 'PUBLIC_STREET_ADDRESS', '123 Main Street'),
-    city: getConfigValue('address.city', 'PUBLIC_CITY', 'Your City'),
-    state: getConfigValue('address.state', 'PUBLIC_STATE', 'State'),
-    postcode: getConfigValue('address.postcode', 'PUBLIC_POSTCODE', '5000'),
-    country: getConfigValue('address.country', 'PUBLIC_COUNTRY', 'Australia'),
+    street: getConfigValue('address.street', 'PUBLIC_STREET_ADDRESS', ''),
+    city: getConfigValue('address.city', 'PUBLIC_CITY', ''),
+    state: getConfigValue('address.state', 'PUBLIC_STATE', ''),
+    postcode: getConfigValue('address.postcode', 'PUBLIC_POSTCODE', ''),
+    country: getConfigValue('address.country', 'PUBLIC_COUNTRY', ''),
     countryCode: getConfigValue('address.country_code', 'PUBLIC_COUNTRY_CODE', undefined),
   } as Address,
   
   // Business Hours
   hours: {
-    monday: getConfigValue('hours.monday', 'PUBLIC_HOURS_MONDAY', '9:00 AM - 5:00 PM'),
-    tuesday: getConfigValue('hours.tuesday', 'PUBLIC_HOURS_TUESDAY', '9:00 AM - 5:00 PM'),
-    wednesday: getConfigValue('hours.wednesday', 'PUBLIC_HOURS_WEDNESDAY', '9:00 AM - 5:00 PM'),
-    thursday: getConfigValue('hours.thursday', 'PUBLIC_HOURS_THURSDAY', '9:00 AM - 5:00 PM'),
-    friday: getConfigValue('hours.friday', 'PUBLIC_HOURS_FRIDAY', '9:00 AM - 5:00 PM'),
-    saturday: getConfigValue('hours.saturday', 'PUBLIC_HOURS_SATURDAY', '9:00 AM - 1:00 PM'),
-    sunday: getConfigValue('hours.sunday', 'PUBLIC_HOURS_SUNDAY', 'Closed'),
+    monday: getConfigValue('hours.monday', 'PUBLIC_HOURS_MONDAY', ''),
+    tuesday: getConfigValue('hours.tuesday', 'PUBLIC_HOURS_TUESDAY', ''),
+    wednesday: getConfigValue('hours.wednesday', 'PUBLIC_HOURS_WEDNESDAY', ''),
+    thursday: getConfigValue('hours.thursday', 'PUBLIC_HOURS_THURSDAY', ''),
+    friday: getConfigValue('hours.friday', 'PUBLIC_HOURS_FRIDAY', ''),
+    saturday: getConfigValue('hours.saturday', 'PUBLIC_HOURS_SATURDAY', ''),
+    sunday: getConfigValue('hours.sunday', 'PUBLIC_HOURS_SUNDAY', ''),
   } as BusinessHours,
   
   // Social Media
@@ -232,7 +232,8 @@ export const siteConfig = {
   
   get fullAddress() {
     const { street, city, state, postcode } = this.address;
-    return `${street}, ${city} ${state} ${postcode}`;
+    const locality = [city, state, postcode].filter(Boolean).join(' ');
+    return [street, locality].filter(Boolean).join(', ');
   },
 };
 

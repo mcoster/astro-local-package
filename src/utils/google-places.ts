@@ -124,6 +124,10 @@ export async function getMapEmbedConfig() {
       apiKey: siteConfig.googleMaps.apiKey
     };
   }
+
+  if (!siteConfig.fullAddress) {
+    return { type: 'none' as const };
+  }
   
   // Level 3: Try to discover Google Business Profile
   if (siteConfig.googleMaps.apiKey) {
@@ -170,6 +174,8 @@ export async function getCachedMapEmbedConfig() {
  * Generate the iframe URL based on the embed configuration
  */
 export function generateEmbedUrl(config: Awaited<ReturnType<typeof getMapEmbedConfig>>): string {
+  if (config.type === 'none') return '';
+
   if (config.type === 'iframe') {
     // Extract src from iframe HTML if needed
     const srcMatch = config.content.match(/src="([^"]+)"/);
