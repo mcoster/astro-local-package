@@ -42,6 +42,10 @@ function graphNodes(html) {
   return scripts[0]['@graph'];
 }
 
+function localBusinessNodes(html) {
+  return graphNodes(html).filter((node) => node['@type'] === 'LocalBusiness');
+}
+
 test('roof fixture builds one graph with LocalBusiness, deduped FAQ, and visible cost ranges', async () => {
   const html = await buildFixture('site-roof');
   const nodes = graphNodes(html);
@@ -54,14 +58,36 @@ test('roof fixture builds one graph with LocalBusiness, deduped FAQ, and visible
   assert.match(html, /Estimate only/);
   assert.equal(html.includes('PriceSpecification'), false);
   assert.equal(html.includes('approved_by'), false);
+  assert.match(html, /07 5555 1234/);
+  assert.match(html, /href="tel:0755559999"/);
+  assert.match(html, /quotes@goldcoastroofcare\.example/);
+  assert.match(html, /12 Marine Parade/);
+  assert.match(html, /google\.com\/maps\/embed\/v1\/place/);
+  const [business] = localBusinessNodes(html);
+  assert.equal(business.telephone, '07 5555 1234');
+  assert.equal(business.address.streetAddress, '12 Marine Parade');
+  assert.ok(business.openingHoursSpecification.length > 0);
 });
 
-test('pool fixture suppresses LocalBusiness when identity is incomplete but keeps FAQPage', async () => {
+test('pool fixture omits absent contact facts and keeps an enquiry action', async () => {
   const html = await buildFixture('site-pool');
-  const nodes = graphNodes(html);
 
-  assert.equal(nodes.some((node) => node['@type'] === 'LocalBusiness'), false);
-  assert.equal(nodes.filter((node) => node['@type'] === 'FAQPage').length, 1);
-  assert.match(html, /Estimate only/);
-  assert.equal(html.includes('PriceSpecification'), false);
+  for (const invented of [
+    '(00) 0000 0000',
+    'info@example.com',
+    '123 Main Street',
+    '5000',
+    '9:00 AM - 5:00 PM',
+  ]) {
+    assert.equal(html.includes(invented), false);
+  }
+  assert.equal(html.includes('href="tel:'), false);
+  assert.equal(html.includes('href="mailto:'), false);
+  assert.equal(/<div class="floating-cta(?:\s|")/.test(html), false);
+  assert.equal(/<div class="contact-info-section(?:\s|")/.test(html), false);
+  assert.equal(/<div class="map-embed(?:\s|")/.test(html), false);
+  assert.equal(html.includes('google.com/maps/embed'), false);
+  assert.equal(localBusinessNodes(html).length, 0);
+  assert.match(html, /Send an Enquiry/);
+  assert.match(html, /href="\/contact"/);
 });

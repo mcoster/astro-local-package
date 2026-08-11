@@ -3,8 +3,13 @@ import Layout from '@package/layouts/Layout.astro';
 import ContentBlocks from '@package/components/ContentBlocks.astro';
 import ServiceFAQ from '@package/components/ServiceFAQ.astro';
 import CostRangeTable from '@package/components/CostRangeTable.astro';
+import Hero from '@package/components/Hero.astro';
+import FloatingCTA from '@package/components/FloatingCTA.astro';
+import ContactInfo from '@package/components/ContactInfo.astro';
+import MapEmbed from '@package/components/MapEmbed.astro';
 import { COST_ESTIMATE_DISCLAIMER } from '@package/content/cost/schema';
 import { faqEntriesFromAnswerBlocks } from '@package/utils/schema';
+import { siteConfig } from '@package/config/site';
 
 const answerBlocks = [
   {
@@ -49,6 +54,14 @@ const faqs = [
   faqs={faqs}
 >
   <main>
+    <Hero backgroundImage="" />
+    <FloatingCTA phoneNumber={siteConfig.phone} showOnScroll={false} />
+    <ContactInfo
+      phone={siteConfig.phone}
+      email={siteConfig.email}
+      address={siteConfig.fullAddress}
+    />
+    <MapEmbed />
     <ContentBlocks blocks={answerBlocks} alternateBackground={false} />
     <CostRangeTable ranges={ranges} disclaimer={COST_ESTIMATE_DISCLAIMER} />
     <ServiceFAQ faqs={serviceFaqs} />
