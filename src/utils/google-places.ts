@@ -124,9 +124,9 @@ export async function getMapEmbedConfig() {
       apiKey: siteConfig.googleMaps.apiKey
     };
   }
-  
+
   // Level 3: Try to discover Google Business Profile
-  if (siteConfig.googleMaps.apiKey) {
+  if (siteConfig.fullAddress && siteConfig.googleMaps.apiKey) {
     const discoveredPlaceId = await discoverBusinessPlaceId(
       siteConfig.businessName,
       siteConfig.fullAddress,
@@ -175,6 +175,8 @@ export function generateEmbedUrl(config: Awaited<ReturnType<typeof getMapEmbedCo
     const srcMatch = config.content.match(/src="([^"]+)"/);
     return srcMatch ? srcMatch[1] : '';
   }
+
+  if (config.type === 'address' && !config.address) return '';
   
   const baseUrl = 'https://www.google.com/maps/embed/v1/place';
   const params = new URLSearchParams();
