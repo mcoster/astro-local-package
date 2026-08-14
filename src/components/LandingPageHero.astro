@@ -126,6 +126,12 @@ const processedSubtitle = processor.processString(subtitle);
       var params = new URLSearchParams(window.location.search);
       var st = params.get('st');
       if (st) {
+        // Clamp DKI input: ?st= is attacker-visible URL input rendered into
+        // the headline and document title. Strip anything outside a
+        // conservative keyword charset, collapse whitespace, cap the length.
+        st = st.replace(/[^A-Za-z0-9 '&-]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 60);
+      }
+      if (st) {
         var titleCased = st.replace(/\b\w/g, function(c) { return c.toUpperCase(); });
         var headline = document.getElementById('dki-headline');
         if (headline) {
