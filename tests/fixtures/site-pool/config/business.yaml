@@ -2,13 +2,13 @@ business:
   name: Gold Coast Pool Pros
   tagline: Pool care for Gold Coast homes
   phone: ""
-  email: hello@goldcoastpoolpros.example
+  email: ""
 address:
-  street: 123 Main Street
-  city: Burleigh Heads
-  state: QLD
-  postcode: "4220"
-  country: Australia
+  street: ""
+  city: ""
+  state: ""
+  postcode: ""
+  country: ""
 service:
   main_category: Pool Cleaning
   main_location: Gold Coast
@@ -22,13 +22,13 @@ colors:
   accent: F59E0B
   cta: DC2626
 hours:
-  monday: 8:00 AM - 5:00 PM
-  tuesday: 8:00 AM - 5:00 PM
-  wednesday: 8:00 AM - 5:00 PM
-  thursday: 8:00 AM - 5:00 PM
-  friday: 8:00 AM - 5:00 PM
-  saturday: Closed
-  sunday: Closed
+  monday: ""
+  tuesday: ""
+  wednesday: ""
+  thursday: ""
+  friday: ""
+  saturday: ""
+  sunday: ""
 social: {}
 website:
   url: https://pool.example.com

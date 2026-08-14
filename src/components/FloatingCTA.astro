@@ -19,9 +19,10 @@ const {
   zIndex = 40,
 } = Astro.props;
 
-const formattedPhone = siteConfig.formattedPhone;
+const formattedPhone = phoneNumber.replace(/\D/g, '');
 ---
 
+{formattedPhone && (
 <div 
   class={`floating-cta floating-cta--${position} ${showOnScroll ? 'floating-cta--scroll' : ''} ${className}`}
   data-show-on-scroll={showOnScroll}
@@ -42,6 +43,7 @@ const formattedPhone = siteConfig.formattedPhone;
   </a>
   <div class="floating-cta__pulse"></div>
 </div>
+)}
 
 <script>
   document.addEventListener('DOMContentLoaded', () => {

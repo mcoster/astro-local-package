@@ -103,13 +103,13 @@ const currentPath = Astro.url.pathname;
           ))}
         </nav>
         
-          <a
+          {siteConfig.formattedPhone && <a
             href={`tel:${siteConfig.formattedPhone}`}
             title={`Call ${siteConfig.businessName}`}
             class="hidden md:inline-flex items-center justify-center btn-cta-compact"
           >
             Call {siteConfig.phone}
-          </a>
+          </a>}
           
           <!-- Mobile Menu Button -->
           <button
@@ -183,12 +183,12 @@ const currentPath = Astro.url.pathname;
           </a>
         )
       ))}
-      <a
+      {siteConfig.formattedPhone && <a
         href={`tel:${siteConfig.formattedPhone}`}
         class="flex items-center justify-center btn-cta-compact"
       >
         Call {siteConfig.phone}
-      </a>
+      </a>}
     </div>
   </nav>
 </header>

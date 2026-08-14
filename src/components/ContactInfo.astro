@@ -19,8 +19,11 @@ const {
   address,
   showIcons = true,
 } = Astro.props;
+
+const hasContactInfo = Boolean(phone?.trim() || email?.trim() || address?.trim());
 ---
 
+{hasContactInfo && (
 <div class="contact-info-section">
   <div class="container mx-auto px-4 max-w-2xl">
     <div class="bg-white rounded-lg shadow-sm p-6">
@@ -77,6 +80,7 @@ const {
     </div>
   </div>
 </div>
+)}
 
 <style>
   .contact-info-section {
