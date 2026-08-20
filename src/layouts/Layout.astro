@@ -30,7 +30,7 @@ const {
   includeLocalBusiness = true,
 } = Astro.props;
 
-const pageTitle = title === siteConfig.businessName ? title : `${title} | ${siteConfig.businessName}`;
+const pageTitle = title.endsWith(siteConfig.businessName) ? title : `${title} | ${siteConfig.businessName}`;
 const canonicalURL = new URL(Astro.url.pathname, siteConfig.siteUrl);
 const pageSchema = buildPageSchema({
   siteConfig,
