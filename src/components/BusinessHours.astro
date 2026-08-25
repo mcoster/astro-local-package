@@ -6,9 +6,12 @@ export interface Props {
   showStatus?: boolean;
 }
 
-const { 
+const {
   title = 'Business Hours',
-  showStatus = true 
+  // ponytail: static builds can't know "open now" (siteConfig.isOpenNow was
+  // never defined, so this badge showed "Closed" 24/7 fleet-wide); default
+  // off — a client-side clock is the upgrade path if the badge is wanted.
+  showStatus = false
 } = Astro.props;
 
 const hours = siteConfig.hours;
